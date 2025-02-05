@@ -5,7 +5,11 @@ Before you begin, please read the Legal section (TBD).
 
 To proceed with the installation, please click on the following link, which will download the installation script on your local computer, and prompt you to run with Administrator privileges (which it requires to perform its tasks). Clicking `yes` in this diaglog will start the installation.
 
-[Qiskit Windows Installer script](http://boxstarter.org/package/url?https://raw.githubusercontent.com/ket-q/qiskit_windows_installer/main/box_install.ps1) 
+ 
+
+[Qiskit Windows Installer script](http://boxstarter.org/package/url?https://raw.githubusercontent.com/ket-q/qiskit_windows_installer/main/box_install.ps1)
+
+**Note:** for this to work you need a browser with ClickOnce support, such as Microsoft Edge or Internet Explorer.
 
 ## Appendices
 ### Chocolatey

@@ -21,6 +21,11 @@ Chololatey installs its programs below its own installation folder in `C:\Progra
 ```bash
 choco list --exact python --trace
 ```
+#### Boxstarter
+Boxstarter is a part of Chocolatey. Running a Boxstarter script from the command-line (notice `-DisableReboots`):
+```bash
+Install-BoxstarterPackage -PackageName .\win_update.ps1 -DisableReboots
+```
 ### Pipenv
 [Pipenv](https://pipenv.pypa.io/en/latest/) is a tool to manage Python virtual environments and their software packages, and to facilitate packaging of packages present in a virtual environment.
 It is capable of `dependency resolution`, which makes sure that all package dependencies are met. An introductions to Pipenv is from RealPython ([link](https://realpython.com/pipenv-guide/)), more advanced usage is described on the Pipenv website ([link](https://docs.pipenv.org/advanced/#configuration-with-environment-variables)).

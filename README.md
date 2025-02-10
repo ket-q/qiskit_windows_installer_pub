@@ -22,6 +22,7 @@ Chololatey installs its programs below its own installation folder in `C:\Progra
 choco list --exact python --trace
 ```
 #### Boxstarter
+The Boxstarter founder has a blog with related entries ([link1](https://www.hurryupandwait.io/blog/setup-a-new-machine-with-just-a-url-and-chocolatey-package), [link2](https://www.hurryupandwait.io/search?q=boxstarter&f_collectionId=53f3208ce4b02368bad86b71)).
 Boxstarter is a part of Chocolatey. Running a Boxstarter script from the command-line (notice `-DisableReboots`):
 ```bash
 Install-BoxstarterPackage -PackageName .\win_update.ps1 -DisableReboots

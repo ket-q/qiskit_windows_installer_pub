@@ -2,6 +2,9 @@
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 
+$python_version = "3.12.9"
+
+
 # Elevating to Administrator rights..."
 
 # Get the ID and security principal of the current user account
@@ -157,7 +160,6 @@ Install-VSC-Extension "ms-toolsai.jupyter"
 # pyenv-win
 #
 Write-Header "Step 2: Install pyenv-win"
-Write-Host "You are in ${env:USERPROFILE}"
 if (!(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
     Write-Host("pyenv-win not not installed, running installer")
     Install-pyenv-win
@@ -167,6 +169,14 @@ if (!(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
     Write-Host("pyenv-win installed")
 }
 
+#
+# Python
+#
+Write-Header "Step 3: Install Python $python_version"
+Write-Host "$env:LOCALAPPDATA"
+Write-Host "You are in ${env:USERPROFILE}"
+$QINST_ROOT = "${env:LOCALAPPDATA}\qiskit_windows_installer"
+New-Item -Path "$QINST_ROOT" -ItemType Directory
 
 #if (!(Get-Command choco.exe -ErrorAction SilentlyContinue) ) {
 #    Write-Host("not installed, running installer")

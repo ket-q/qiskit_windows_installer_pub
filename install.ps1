@@ -37,7 +37,7 @@ if ($myWindowsPrincipal.IsInRole($adminRole))
     Exit;
 }
 
-function write-header {
+function Write-Header {
     param(
         [Parameter(Mandatory = $true, Position = 1, HelpMessage = "The message to write")]
         [string]$msg
@@ -48,7 +48,18 @@ function write-header {
     Write-Host "====$fill===="
 }
 
-write-header "Step 1: Install Chocolatey"
+#
+# Main
+#
+
+Set-ExecutionPolicy Bypass -Scope Process -Force
+
+Write-Header "Step 1: Install Chocolatey"
+if (!(Get-Command choco.exe -ErrorAction SilentlyContinue) ) {
+    Write-Host("not installed, running installer")
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+    iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+}
 
 
 

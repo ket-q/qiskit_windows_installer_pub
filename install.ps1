@@ -1,4 +1,8 @@
-Write-Host "Elevating to Administrator rights..."
+# Stop the script when a cmdlet or a native command fails
+$ErrorActionPreference = 'Stop'
+$PSNativeCommandUseErrorActionPreference = $true
+
+# Elevating to Administrator rights..."
 
 # Get the ID and security principal of the current user account
 $myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent();
@@ -14,8 +18,7 @@ if ($myWindowsPrincipal.IsInRole($adminRole))
     $Host.UI.RawUI.WindowTitle = $myInvocation.MyCommand.Definition + "(Elevated)";
     $Host.UI.RawUI.BackgroundColor = "DarkBlue";
     Clear-Host;
-}
-else {
+} else {
     # We are not running as an administrator, so relaunch as administrator
 
     # Create a new process object that starts PowerShell
@@ -34,11 +37,26 @@ else {
     Exit;
 }
 
-Write-Host "Qiskit_Windows_Installer starting..."
+function write-header {
+    param(
+        [Parameter(Mandatory = $true, Position = 1, HelpMessage = "The message to write")]
+        [string]$msg
+    )
+    $fill = "="*$msg.Length
+    Write-Host "====$fill===="
+    Write-Host "==  $msg  =="
+    Write-Host "====$fill===="
+}
 
-powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"; if ($LASTEXITCODE -eq 0) { SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin" }
+write-header "Step 1: Install Chocolatey"
+
+
+
+
+# Install Chocolatey
+# powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"; if ($LASTEXITCODE -eq 0) { SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin" }
 
 # Default ``yes'' for all questions to the user
-choco feature enable -n allowGlobalConfirmation
+# choco feature enable -n allowGlobalConfirmation
 
-choco install python
+# choco install python

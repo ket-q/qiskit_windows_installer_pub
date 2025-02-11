@@ -50,13 +50,34 @@ function Write-Header {
     Write-Host "====$fill===="
 }
 
-function Refresh-Env {
-    # Reload PATH variable to get modifications from program installers
+function Refresh-PATH {
+    # Reload PATH environment variable to get modifications from program installers
     Write-Host "Refresh-Env old PATH: $env:path"
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") +
                 ";" +
                 [System.Environment]::GetEnvironmentVariable("Path","User")
     Write-Host "Refresh-Env new PATH: $env:path"
+}
+
+function Refresh-pyenv_Env {
+    # Reload PyEnv environment variable (except PATH) to get modifications from installer
+    Write-Host "Refresh-Env old PYENV: $env:PYENV"
+    $env:Path = [System.Environment]::GetEnvironmentVariable("PYENV","Machine") +
+                ";" +
+                [System.Environment]::GetEnvironmentVariable("PYENV","User")
+    Write-Host "Refresh-Env new PYENV: $env:PYENV"
+
+    Write-Host "Refresh-Env old PYENV_ROOT: $env:PYENV_ROOT"
+    $env:Path = [System.Environment]::GetEnvironmentVariable("PYENV_ROOT","Machine") +
+                ";" +
+                [System.Environment]::GetEnvironmentVariable("PYENV_ROOT","User")
+    Write-Host "Refresh-Env new PYENV_ROOT: $env:PYENV_ROOT"
+    
+    Write-Host "Refresh-Env old PYENV_HOME: $env:PYENV_HOME"
+    $env:Path = [System.Environment]::GetEnvironmentVariable("PYENV_HOME","Machine") +
+                ";" +
+                [System.Environment]::GetEnvironmentVariable("PYENV_HOME","User")
+    Write-Host "Refresh-Env new PYENV_HOME: $env:PYENV_HOME"    
 }
 
 function Install-VSC {
@@ -100,6 +121,14 @@ function Install-VSC-Extension {
     }
 }
 
+function Install-pyenv-win {
+    # Download and install
+    $ProgressPreference = 'SilentlyContinue' # omit progress update to favour fast download time
+    Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/pyenv-win/pyenv-win/master/pyenv-win/install-pyenv-win.ps1" -OutFile "./install-pyenv-win.ps1"; &"./install-pyenv-win.ps1"
+    
+    # Cleanup
+    Remove-Item install-pyenv-win.ps1
+}
 
 #
 # Main
@@ -114,7 +143,7 @@ Write-Header "Step 1: Install VSCode"
 if (!(Get-Command code -ErrorAction SilentlyContinue) ) {
     Write-Host("VSCode not not installed, running installer")
     Install-VSC local
-    Refresh-Env
+    Refresh-PATH
 } else {
     Write-Host("VSCode installed")
 }
@@ -128,7 +157,15 @@ Install-VSC-Extension "ms-toolsai.jupyter"
 # pyenv-win
 #
 Write-Header "Step 2: Install pyenv-win"
-
+Write-Host "You are in ${env:USERPROFILE}"
+if (!(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
+    Write-Host("pyenv-win not not installed, running installer")
+    Install-pyenv-win
+    Refresh-PATH
+    Refresh-pyenv_Env
+} else {
+    Write-Host("pyenv-win installed")
+}
 
 
 #if (!(Get-Command choco.exe -ErrorAction SilentlyContinue) ) {

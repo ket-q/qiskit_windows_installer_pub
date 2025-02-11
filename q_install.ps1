@@ -66,7 +66,8 @@ function Install-VSC {
 
     # Download VSCode
     Write-Host "Downloading VSCode"
-    Invoke-WebRequest -Uri $VSCodeUrl -OutFile $Destination # Install VS Code silently
+    $ProgressPreference = 'SilentlyContinue' # omit progress update to favour fast download time
+    Invoke-WebRequest -Uri $VSCodeUrl -OutFile $Destination
 
     # Install VSCode
     Write-Host "Installing VSCode"
@@ -95,6 +96,9 @@ function Install-VSC-Extension {
 
 Set-ExecutionPolicy Bypass -Scope Process -Force
 
+#
+# VSCode
+#
 Write-Header "Step 1: Install VSCode"
 if (!(Get-Command code -ErrorAction SilentlyContinue) ) {
     Write-Host("VSCode not not installed, running installer")
@@ -107,6 +111,12 @@ Install-VSC-Extension "ms-python.python"
 
 Write-Host "Installing VSCode Jupyter extension"
 Install-VSC-Extension "ms-toolsai.jupyter"
+
+#
+# pyenv-win
+#
+Write-Header "Step 2: Install pyenv-win"
+
 
 
 #if (!(Get-Command choco.exe -ErrorAction SilentlyContinue) ) {

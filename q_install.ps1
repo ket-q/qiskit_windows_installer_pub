@@ -16,16 +16,18 @@ if ($myWindowsPrincipal.IsInRole($adminRole))
 {
     # We are running as an administrator, so change the title and background colour to indicate this
     $Host.UI.RawUI.WindowTitle = $myInvocation.MyCommand.Definition + "(Elevated)";
-    $Host.UI.RawUI.BackgroundColor = "DarkBlue";
-    Clear-Host;
+    #$Host.UI.RawUI.BackgroundColor = "DarkBlue";
+    #Clear-Host;
+    Write-Host "Script running as administrator..."
 } else {
     # We are not running as an administrator, so relaunch as administrator
+    Write-Host "Script not running as administrator..."
 
     # Create a new process object that starts PowerShell
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo "PowerShell";
 
     # Specify the current script path and name as a parameter with added scope and support for scripts with spaces in it's path
-    $newProcess.Arguments = "& '" + $script:MyInvocation.MyCommand.Path + "'"
+    $newProcess.Arguments = "& '" + $script:MyInvocation.MyCommand.Path + " -NoExit'"
 
     # Indicate that the process should be elevated
     $newProcess.Verb = "runas";
@@ -46,6 +48,15 @@ function Write-Header {
     Write-Host "====$fill===="
     Write-Host "==  $msg  =="
     Write-Host "====$fill===="
+}
+
+function Refresh-Env {
+    # Reload PATH variable to get modifications from program installers
+    Write-Host "Refresh-Env old PATH: $env:path"
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") +
+                ";" +
+                [System.Environment]::GetEnvironmentVariable("Path","User")
+    Write-Host "Refresh-Env new PATH: $env:path"
 }
 
 function Install-VSC {
@@ -103,6 +114,7 @@ Write-Header "Step 1: Install VSCode"
 if (!(Get-Command code -ErrorAction SilentlyContinue) ) {
     Write-Host("VSCode not not installed, running installer")
     Install-VSC local
+    Refresh-Env
 } else {
     Write-Host("VSCode installed")
 }

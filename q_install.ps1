@@ -176,7 +176,14 @@ Write-Header "Step 3: Install Python $python_version"
 Write-Host "$env:LOCALAPPDATA"
 Write-Host "You are in ${env:USERPROFILE}"
 $QINST_ROOT = "${env:LOCALAPPDATA}\qiskit_windows_installer"
-New-Item -Path "$QINST_ROOT" -ItemType Directory
+if (!(Test-Path $QINST_ROOT)){
+    New-Item -Path "$QINST_ROOT" -ItemType Directory
+} else {
+    # Make sure $QINST_ROOT is a folder and not a file
+    if( !($QINST_ROOT.PSIsContainer) ) {
+        # TBD: Error out
+    } 
+}
 
 #if (!(Get-Command choco.exe -ErrorAction SilentlyContinue) ) {
 #    Write-Host("not installed, running installer")

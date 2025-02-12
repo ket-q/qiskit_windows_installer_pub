@@ -3,44 +3,45 @@ $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 
 $python_version = "3.12.9"
+$qiskit_version = "1.3.2"
+$qwi_vstr = "qwi_p" + $python_version.Replace(".", "_") + "_q" + $qiskit_version.Replace(".", "_")
 
+# # Elevating to Administrator rights..."
 
-# Elevating to Administrator rights..."
+# # Get the ID and security principal of the current user account
+# $myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent();
+# $myWindowsPrincipal = New-Object System.Security.Principal.WindowsPrincipal($myWindowsID);
 
-# Get the ID and security principal of the current user account
-$myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent();
-$myWindowsPrincipal = New-Object System.Security.Principal.WindowsPrincipal($myWindowsID);
+# # Get the security principal for the administrator role
+# $adminRole = [System.Security.Principal.WindowsBuiltInRole]::Administrator;
 
-# Get the security principal for the administrator role
-$adminRole = [System.Security.Principal.WindowsBuiltInRole]::Administrator;
+# # Check to see if we are currently running as an administrator
+# if ($myWindowsPrincipal.IsInRole($adminRole))
+# {
+#     # We are running as an administrator, so change the title and background colour to indicate this
+#     $Host.UI.RawUI.WindowTitle = $myInvocation.MyCommand.Definition + "(Elevated)";
+#     #$Host.UI.RawUI.BackgroundColor = "DarkBlue";
+#     #Clear-Host;
+#     Write-Host "Script running as administrator..."
+# } else {
+#     # We are not running as an administrator, so relaunch as administrator
+#     Write-Host "Script not running as administrator..."
 
-# Check to see if we are currently running as an administrator
-if ($myWindowsPrincipal.IsInRole($adminRole))
-{
-    # We are running as an administrator, so change the title and background colour to indicate this
-    $Host.UI.RawUI.WindowTitle = $myInvocation.MyCommand.Definition + "(Elevated)";
-    #$Host.UI.RawUI.BackgroundColor = "DarkBlue";
-    #Clear-Host;
-    Write-Host "Script running as administrator..."
-} else {
-    # We are not running as an administrator, so relaunch as administrator
-    Write-Host "Script not running as administrator..."
+#     # Create a new process object that starts PowerShell
+#     $newProcess = New-Object System.Diagnostics.ProcessStartInfo "PowerShell";
 
-    # Create a new process object that starts PowerShell
-    $newProcess = New-Object System.Diagnostics.ProcessStartInfo "PowerShell";
+#     # Specify the current script path and name as a parameter with added scope and support for scripts with spaces in it's path
+#     $newProcess.Arguments = "& '" + $script:MyInvocation.MyCommand.Path + " -NoExit'"
 
-    # Specify the current script path and name as a parameter with added scope and support for scripts with spaces in it's path
-    $newProcess.Arguments = "& '" + $script:MyInvocation.MyCommand.Path + " -NoExit'"
+#     # Indicate that the process should be elevated
+#     $newProcess.Verb = "runas";
 
-    # Indicate that the process should be elevated
-    $newProcess.Verb = "runas";
+#     # Start the new process
+#     [System.Diagnostics.Process]::Start($newProcess);
 
-    # Start the new process
-    [System.Diagnostics.Process]::Start($newProcess);
-
-    # Exit from the current, unelevated, process
-    Exit;
-}
+#     # Exit from the current, unelevated, process
+#     Exit;
+# }
 
 function Write-Header {
     param(
@@ -51,6 +52,26 @@ function Write-Header {
     Write-Host "====$fill===="
     Write-Host "==  $msg  =="
     Write-Host "====$fill===="
+}
+
+function Fatal-Error {
+    param(
+        [Parameter(Mandatory = $true, Position = 1, HelpMessage = "The error message to write")]
+        [string]$err_msg,
+
+        [Parameter(Mandatory = $true, Position = 2, HelpMessage = "Exit code of the program")]
+        [int]$err_val
+    )
+    $first = $true
+    ForEach ($line in $($err_msg -split "\r?\n|\r")) {
+        if ($first) {
+            Write-Host "ERROR: $line"
+            $first = $false
+        } else {
+            Write-Host "       $line"
+        }
+    }
+    Exit $err_val
 }
 
 function Refresh-PATH {
@@ -160,13 +181,23 @@ Install-VSC-Extension "ms-toolsai.jupyter"
 # pyenv-win
 #
 Write-Header "Step 2: Install pyenv-win"
-if (!(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
-    Write-Host("pyenv-win not not installed, running installer")
+if ( !(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
+    Write-Host("pyenv-win not installed, running installer")
     Install-pyenv-win
     Refresh-PATH
     Refresh-pyenv_Env
+    # Ensure pyenv-win installation succeeded:
+    if ( !(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
+        $err_msg = (
+            "pyenv-win installation failed.",
+            "Manual check required."
+            ) -join "`r`n"
+        Fatal-Error $err_msg 1
+    } else {
+        Write-Host("pyenv-win installation succeeded")
+    }
 } else {
-    Write-Host("pyenv-win installed")
+    Write-Host("pyenv-win already installed")
 }
 
 #
@@ -178,12 +209,38 @@ Write-Host "You are in ${env:USERPROFILE}"
 $QINST_ROOT = "${env:LOCALAPPDATA}\qiskit_windows_installer"
 if (!(Test-Path $QINST_ROOT)){
     New-Item -Path "$QINST_ROOT" -ItemType Directory
-} else {
-    # Make sure $QINST_ROOT is a folder and not a file
-    if( !($QINST_ROOT.PSIsContainer) ) {
-        # TBD: Error out
-    } 
 }
+
+$qinst_root_obj = get-item "$QINST_ROOT"
+
+# Check that $QINST_ROOT is a folder and not a file. Required if
+# the name already pre-existed in the filesystem.
+if ( !($qinst_root_obj.PSIsContainer) ) {
+    $err_msg = (
+        "$QINST_ROOT is not a folder.",
+        "Please move $QINST_ROOT out of the way and re-run the script."
+        ) -join "`r`n"
+    Fatal-Error $err_msg 1
+} 
+
+# Create $QINST_ROOT\$qwi_vstr, which is the enclave folder where we set up the
+# virtual environment.
+$QINST_ENCLAVE = Join-Path $QINST_ROOT -ChildPath $qwi_vstr
+if (!(Test-Path $QINST_ENCLAVE)){
+    New-Item -Path "$QINST_ENCLAVE" -ItemType Directory
+}
+$Error.Clear()
+Set-Location -Path "$QINST_ENCLAVE" -ErrorAction SilentlyContinue
+if ($Error) {
+    $err_msg = (
+        "Unable to cd into $QINST_ENCLAVE.",
+        "Manual intervention required."
+        ) -join "`r`n"
+    Fatal-Error $err_msg 1  
+}
+$a = Invoke-Command { pyenv install -l}
+Write-Host $a
+
 
 #if (!(Get-Command choco.exe -ErrorAction SilentlyContinue) ) {
 #    Write-Host("not installed, running installer")

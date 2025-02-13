@@ -393,6 +393,9 @@ Log-Err 'fatal' 'bootstrap venv setup in enclave' `
 
 # Create 'official' venv
 
+# Since 2024 part of Win 10/11, make sure to use the exe prefix to avoid quirk:
+# curl.exe --version
+
 # w/o pipenv (rationale: pipenv is extremely slow in installing packages):
 # pyenv exec python -m venv C:\Users\bburg\.virtualenvs\my_test
 # cd C:\Users\bburg\.virtualenvs\

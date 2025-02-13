@@ -127,7 +127,7 @@ Parameters:
     # If all error variables are empty (no error occurred), we only log
     # and return.
     if (!$have_error) {
-        $msg = "${secondArg}: OK"
+        $msg = "|STATUS| ${secondArg}: DONE"
         Write-Host $msg
         return
     }
@@ -216,7 +216,10 @@ function Install-VSC {
 
 function Install-VSC-Extension {
     param (
-        [Parameter(Mandatory = $true, Position = 1, HelpMessage = "Extension to install")]
+        [Parameter(
+            Mandatory = $true,
+            Position = 1,
+            HelpMessage = "Name of VSCode extension to install")]
         [string]$ext
     )
     if ( $(@(code --list-extensions | ? { $_ -match "$ext" }).Count -ge 1) ) {
@@ -312,36 +315,95 @@ if ( !($qinst_root_obj.PSIsContainer) ) {
 
 # Create $QINST_ROOT\$qwi_vstr, which is the enclave folder where we set up the
 # virtual environment.
-$QINST_ENCLAVE = Join-Path $QINST_ROOT -ChildPath $qwi_vstr
-if (!(Test-Path $QINST_ENCLAVE)){
-    New-Item -Path "$QINST_ENCLAVE" -ItemType Directory
+try {
+    $QINST_ENCLAVE = Join-Path $QINST_ROOT -ChildPath $qwi_vstr
+    if (!(Test-Path $QINST_ENCLAVE)){
+         New-Item -Path "$QINST_ENCLAVE" -ItemType Directory
+    }
+    Set-Location -Path "$QINST_ENCLAVE"
 }
-$Error.Clear()
-Set-Location -Path "$QINST_ENCLAVE" -ErrorAction SilentlyContinue
-if ($Error) {
+catch {
     $err_msg = (
         "Unable to cd into $QINST_ENCLAVE.",
         "Manual intervention required."
         ) -join "`r`n"
     Fatal-Error $err_msg 1  
 }
-$a = Invoke-Command { pyenv install -l}
-Write-Host $a
+
+#
+# We arrived in the enclave. Now
+# (1) Check that the Python version asked by the user exists in  pyenv
+# (2) setup the Python version asked by the user in the enclave folder
+# (3) create the bootstrap venv that contains pipenv etc.
+# (4) Use pipenv to create the ``official'' venv visible to the user in VSCode
+#
+$versions = Invoke-Command { pyenv install -l } `
+     -ErrorAction SilentlyContinue `
+     -ErrorVariable err_py_list
+# For the regexp match, the dots in the version string are meta-chars:
+$version_pattern = [regex]::Escape($python_version)
+# \b means we only match on word boundaries.
+if (!$versions -match "\b${version_pattern}\b") {
+    $err_py_ver = "pyenv does not provide Python version '$python_version'"
+}
+Invoke-Command { pyenv install $python_version } `
+    -ErrorAction SilentlyContinue `
+    -ErrorVariable err_py_inst
+Invoke-Command { pyenv local $python_version } `
+    -ErrorAction SilentlyContinue `
+    -ErrorVariable err_py_setlocal
+Log-Err 'fatal' 'pyenv Python setup in enclave' $err_py_list $err_py_ver $err_py_inst $err_py_setlocal
+
+$boot_venv_name = "venv_boot"
+
+# Delete a pre-existing bootstrap venv
+try {
+    if (Test-Path $boot_venv_name) {
+        # The bootstrap venv seems to exist already -> remove
+        rm -R .\$boot_venv_name
+    }
+}
+catch {
+    $err_msg = (
+        "Unable to remove existing bootstrap venv in enclave.",
+        "Path: $QINST_ENCLAVE",
+        "Name of venv: '$boot_venv_name'"
+        ) -join "`r`n"
+    Fatal-Error $err_msg 1
+}
+
+# Create bootstrap venv
+Invoke-Command { pyenv exec python -m venv $boot_venv_name } `
+     -ErrorAction SilentlyContinue `
+     -ErrorVariable err_boot_venv
+# Activate bootstrap venv
+Invoke-Command { ".\${boot_venv_name}\Scripts\activate" } `
+    -ErrorAction SilentlyContinue `
+    -ErrorVariable err_boot_venv_activate
+# Update pip of bootstrap venv
+Invoke-Command { pyenv exec python -m pip install --upgrade pip } `
+    -ErrorAction SilentlyContinue `
+    -ErrorVariable err_boot_pip_upgr
+# Install pipenv in venv
+Invoke-Command { pyenv exec pip install pipenv } `
+    -ErrorAction SilentlyContinue `
+    -ErrorVariable err_boot_pipenv
+Log-Err 'fatal' 'bootstrap venv setup in enclave' `
+    $err_boot_venv $err_boot_venv_activate $err_boot_pip_upgr $err_boot_pipenv
+
+# Create 'official' venv
+
+# w/o pipenv (rationale: pipenv is extremely slow in installing packages):
+# pyenv exec python -m venv C:\Users\bburg\.virtualenvs\my_test
+# cd C:\Users\bburg\.virtualenvs\
+# .\my_test\Scripts\activate
+# (my_test) PS C:\Users\bburg> python -m pip install --upgrade pip
+# pip install ipykernel
+# pip install -r requirements.txt
+# python -m ipykernel install --user --name=my_qiskit --display-name "my_qiskit"  # restart VSCode for Jupyter kernel to become visible
 
 
-#if (!(Get-Command choco.exe -ErrorAction SilentlyContinue) ) {
-#    Write-Host("not installed, running installer")
-#    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-#    iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-#}
-
-
-
-
-# Install Chocolatey
-# powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"; if ($LASTEXITCODE -eq 0) { SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin" }
-
-# Default ``yes'' for all questions to the user
-# choco feature enable -n allowGlobalConfirmation
-
-# choco install python
+# old:
+#pyenv exec pipenv install -r requirements.txt
+#pyenv exec pipenv install
+#pyenv exec pipenv install ipykernel

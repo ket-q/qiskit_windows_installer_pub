@@ -74,6 +74,87 @@ function Fatal-Error {
     Exit $err_val
 }
 
+function Log-Err {
+<#
+.SYNOPSIS
+Take a variable-length list of error variables and output them one by one. If
+the firstArg=='fatal', then terminate the script if any of the error variables
+is non-empty.
+
+Parameters:
+(1) firstArg: 'fatal' or 'warn', to determine whether to terminate if any error
+    variable is non-empty
+(2) secondArg: a string containing an overall description what theses errors
+    are about.
+(3) listArgs: one or more error variables
+#>
+    param(
+        [Parameter(
+            Mandatory=$True,
+            Position = 0
+        )]
+        [ValidateSet('fatal', 'warn')]
+        [string]
+        $firstArg = 'fatal',
+
+        [Parameter(
+            Mandatory=$True,
+            Position = 1
+        )]
+        [string]
+        $secondArg,
+     
+        [Parameter(
+            Mandatory=$True,
+            ValueFromRemainingArguments=$true,
+            Position = 2
+        )]
+        [AllowEmptyString()]
+        [string[]]
+        $listArgs
+    )
+    # $listArgs cannot be empty, thus at least one error variable must be present
+    $have_error = $false
+    $err_count = 0
+    $var_count = $listArgs.Length
+    foreach ($listArg in $listArgs) {
+        if ($listArg) {
+            $have_error = $true
+            $err_count = $err_count + 1
+        }
+    }
+    
+    # If all error variables are empty (no error occurred), we only log
+    # and return.
+    if (!$have_error) {
+        $msg = "${secondArg}: OK"
+        Write-Host $msg
+        return
+    }
+
+    # Falling through here means at least one error variable was non-empty,
+    # and we log the details.
+    $sep = "-"*79
+    Write-Host $sep
+    $kind = $(If ($firstArg -eq 'fatal') {"ERROR"} Else {"WARNING"})
+    $ending = $(If ($var_count -gt 1) {"s"} Else {""})
+    Write-Host "${kind}${ending} from '${secondArg}':"
+    #'$firstArg: {0}' -f $firstArg
+    $count = 0
+    foreach ($listArg in $listArgs) {
+        Write-Host $sep
+        'Var[{0}]: {1}' -f $count, $(If ($listArg) {$listArg} Else {"OK"})
+        $count++
+    }
+    Write-Host $sep
+
+    if (($firstArg -eq 'fatal') -and $have_error) {
+        # Terminate the script
+        Exit 1
+    }
+}
+
+
 function Refresh-PATH {
     # Reload PATH environment variable to get modifications from program installers
     Write-Host "Refresh-Env old PATH: $env:path"
@@ -154,10 +235,16 @@ function Install-pyenv-win {
     Remove-Item install-pyenv-win.ps1
 }
 
+
+
 #
 # Main
 #
-
+# [void] (Get-ChildItem -Path "C:\Users" -ErrorAction SilentlyContinue -ErrorVariable err_1)
+# [void] (Get-ChildItem -Path "C:\foo" -ErrorAction SilentlyContinue -ErrorVariable err_2)
+# Log-Err 'fatal' 'The paths I tried' $err_1 $err_2
+# Write-Host 'got past'
+# Exit 0
 Set-ExecutionPolicy Bypass -Scope Process -Force
 
 #

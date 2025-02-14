@@ -2,9 +2,12 @@
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 
-$python_version = "3.12.9"
+$python_version = "3.12.9" # 3.13 not working because ray submodule wants Python 3.12
 $qiskit_version = "1.3.2"
-$qwi_vstr = "qwi_p" + $python_version.Replace(".", "_") + "_q" + $qiskit_version.Replace(".", "_")
+# Name of venv in .virtualenvs
+$qwi_vstr = "qiskit_" + $qiskit_version.Replace(".", "_") + "_p" + $python_version.Replace(".", "_")
+# Name of the requirements.txt file to download from GitHub:
+$requirements_file = "latest_requirements.txt"
 
 # # Elevating to Administrator rights..."
 
@@ -185,6 +188,41 @@ function Refresh-pyenv_Env {
     Write-Host "Refresh-Env new PYENV_HOME: $env:PYENV_HOME"    
 }
 
+function Download-File {
+    param(
+        [Parameter(
+            Mandatory=$True,
+            Position = 0
+        )]
+        [string]
+        $source_URL,
+
+        [Parameter(
+            Mandatory=$True,
+            Position = 1
+        )]
+        [string]
+        $target_name
+    )
+
+    Write-Host "Downloading $source_URL..."
+
+    # Use 'curl.exe' which is the Curl version provided on Win 10 and Win 11.
+    # (The command 'curl' internally maps to Invoke-WebRequest.)
+    try {
+        curl.exe -o $target_name $source_URL
+    }
+    catch {
+        $err_msg = (
+            "File download from $source_URL failed.",
+            "Manual check required."
+            ) -join "`r`n"
+        Fatal-Error $err_msg 1
+    }
+
+    Write-Host "Download DONE"
+}
+
 function Install-VSC {
     param (
         [Parameter(Mandatory = $true, Position = 1, HelpMessage = "local or global install")]
@@ -294,8 +332,8 @@ if ( !(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
 # Python
 #
 Write-Header "Step 3: Install Python $python_version"
-Write-Host "$env:LOCALAPPDATA"
-Write-Host "You are in ${env:USERPROFILE}"
+# Write-Host "$env:LOCALAPPDATA"
+# Write-Host "You are in ${env:USERPROFILE}"
 $QINST_ROOT = "${env:LOCALAPPDATA}\qiskit_windows_installer"
 if (!(Test-Path $QINST_ROOT)){
     New-Item -Path "$QINST_ROOT" -ItemType Directory
@@ -313,8 +351,9 @@ if ( !($qinst_root_obj.PSIsContainer) ) {
     Fatal-Error $err_msg 1
 } 
 
-# Create $QINST_ROOT\$qwi_vstr, which is the enclave folder where we set up the
-# virtual environment.
+# Create the enclave folder $QINST_ROOT\$qwi_vstr. This is from where we
+# set up the virtual environment.
+Write-Header "Step 4: set up enclave folder"
 try {
     $QINST_ENCLAVE = Join-Path $QINST_ROOT -ChildPath $qwi_vstr
     if (!(Test-Path $QINST_ENCLAVE)){
@@ -332,15 +371,18 @@ catch {
 
 #
 # We arrived in the enclave. Now
-# (1) Check that the Python version asked by the user exists in  pyenv
-# (2) setup the Python version asked by the user in the enclave folder
+# (1) Check that the Python version asked by the user exists in pyenv
+# (2) Install the Python version asked by the user
 # (3) create the bootstrap venv that contains pipenv etc.
 # (4) Use pipenv to create the ``official'' venv visible to the user in VSCode
 #
+
+Write-Header "Step 5: Set up Python $python_version for venv"
 $versions = Invoke-Command { pyenv install -l } `
      -ErrorAction SilentlyContinue `
      -ErrorVariable err_py_list
-# For the regexp match, the dots in the version string are meta-chars:
+# For the regexp match, the dots in the version string are meta-chars
+# that we need to escape:
 $version_pattern = [regex]::Escape($python_version)
 # \b means we only match on word boundaries.
 if (!$versions -match "\b${version_pattern}\b") {
@@ -354,7 +396,123 @@ Invoke-Command { pyenv local $python_version } `
     -ErrorVariable err_py_setlocal
 Log-Err 'fatal' 'pyenv Python setup in enclave' $err_py_list $err_py_ver $err_py_inst $err_py_setlocal
 
+# Make sure that user's '.virtualenvs' folder exists or otherwise create it.
+$DOT_VENVS_DIR = Join-Path ${env:USERPROFILE} -ChildPath '.virtualenvs'
+if (!(Test-Path $DOT_VENVS_DIR)){
+    New-Item -Path "$DOT_VENVS_DIR" -ItemType Directory
+}
+
+$dot_venvs_dir_obj = get-item "$DOT_VENVS_DIR"
+
+# Check that '.virtualenvs' is a folder and not a file. Required if
+# the name already pre-existed in the filesystem.
+if ( !($dot_venvs_dir_obj.PSIsContainer) ) {
+    $err_msg = (
+        "$DOT_VENVS_DIR is not a folder.",
+        "Please move $DOT_VENVS_DIR out of the way and re-run the script."
+        ) -join "`r`n"
+    Fatal-Error $err_msg 1
+}
+
+# Test whether a venv of name $qwi_vstr already exists and delete it.
+# Note that VSCode etc. should not use the venv in that moment, but we don't
+# actually check this.
+
+$MY_VENV_DIR = Join-Path ${DOT_VENVS_DIR} -ChildPath $qwi_vstr
+
+try {
+    if (Test-Path $MY_VENV_DIR) {
+        # A venv of that name seems to exist already -> remove
+        rm -R $MY_VENV_DIR
+    }
+}
+catch {
+    $err_msg = (
+        "Unable to remove existing venv.",
+        "Path/venv: $MY_VENV_DIR"
+        ) -join "`r`n"
+    Fatal-Error $err_msg 1
+}
+
+
 $boot_venv_name = "venv_boot"
+
+
+# Create and enter enclave folder $QINST_ROOT\$qwi_vstr. This is from where we
+# set up the virtual environment in .virtualenvs.
+try {
+    $QINST_ENCLAVE = Join-Path $QINST_ROOT -ChildPath $qwi_vstr
+    if (!(Test-Path $QINST_ENCLAVE)){
+         New-Item -Path "$QINST_ENCLAVE" -ItemType Directory
+    }
+    Set-Location -Path "$QINST_ENCLAVE"
+}
+catch {
+    $err_msg = (
+        "Unable to cd into $QINST_ENCLAVE.",
+        "Manual intervention required."
+        ) -join "`r`n"
+    Fatal-Error $err_msg 1  
+}
+
+# Download the requirements.txt file for the new venv
+Download-File `
+    "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}" `
+    "${requirements_file}"
+
+# w/o pipenv (rationale: pipenv is extremely slow in installing packages):
+# pyenv exec python -m venv C:\Users\bburg\.virtualenvs\my_test
+# cd C:\Users\bburg\.virtualenvs\  # not needed
+# .\my_test\Scripts\activate
+# (my_test) PS C:\Users\bburg> python -m pip install --upgrade pip
+# pip install ipykernel
+# pip install -r requirements.txt
+# python -m ipykernel install --user --name=my_qiskit --display-name "my_qiskit"  # restart VSCode for Jupyter kernel to become visible
+
+# Create venv
+Write-Header "Step 6: Set up venv $MY_VENV_DIR"
+Invoke-Command { pyenv exec python -m venv $MY_VENV_DIR } # `
+#     -ErrorAction SilentlyContinue `
+#     -ErrorVariable err_create_venv
+# Activate venv
+& "${MY_VENV_DIR}\Scripts\activate.ps1"
+#    -ErrorAction SilentlyContinue `
+#    -ErrorVariable err_venv_activate
+#& pyenv exec pip --version
+
+#
+# PATH now includes our venv
+#
+
+# Update pip of venv
+& python -m pip install --upgrade pip
+#    -ErrorAction SilentlyContinue `
+#    -ErrorVariable err_pip_upgr
+# Install Qiskit in venv
+& pip install -r $requirements_file
+#    -ErrorAction SilentlyContinue `
+#    -ErrorVariable err_pip_install_qiskit
+
+# Install ipykernel module
+& pip install ipykernel
+#    -ErrorAction SilentlyContinue `
+#    -ErrorVariable err_pip_install_ipykernel
+# Install Jupyter server in venv
+#$mod = "-m ipykernel install"
+#$mod_args = "--user --name=$qwi_vstr --display-name `"$qwi_vstr`""
+& python -m ipykernel install --user --name=$qwi_vstr --display-name "$qwi_vstr"
+# Invoke-Command { pyenv exec python $mod $mod_args } `
+#     -ErrorAction SilentlyContinue `
+#     -ErrorVariable err_venv_install_Jupyter
+
+# Log-Err 'fatal' 'venv setup in .virtualenvs failed' `
+#     $err_create_venv $err_venv_activate $err_pip_upgr `
+#     $err_pip_install_qiskit $err_pip_install_ipykernel `
+#     $err_venv_install_Jupyter
+
+
+
+Exit 0
 
 # Delete a pre-existing bootstrap venv
 try {
@@ -398,7 +556,7 @@ Log-Err 'fatal' 'bootstrap venv setup in enclave' `
 
 # w/o pipenv (rationale: pipenv is extremely slow in installing packages):
 # pyenv exec python -m venv C:\Users\bburg\.virtualenvs\my_test
-# cd C:\Users\bburg\.virtualenvs\
+# cd C:\Users\bburg\.virtualenvs\  # not needed
 # .\my_test\Scripts\activate
 # (my_test) PS C:\Users\bburg> python -m pip install --upgrade pip
 # pip install ipykernel

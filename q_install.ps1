@@ -229,6 +229,126 @@ function Install-pyenv-win {
     Remove-Item install-pyenv-win.ps1
 }
 
+function Check-pyenv-List {
+    param (
+        [Parameter(
+            Mandatory = $true,
+            Position = 1,
+            HelpMessage = "Python version to look for in pyenv local list")]
+        [string]$ver
+    )
+    try {
+        $ret = & pyenv install -l
+    }
+    catch {
+        Log-Err 'fatal' 'pyenv install -l' $($_.Exception.Message)
+    }
+    # For the regexp match, the dots in the version string are meta-chars
+    # that we need to escape:
+    $version_pattern = [regex]::Escape($ver)
+    # \b means we only match on word boundaries.
+    if ( !($versions -match "\b${version_pattern}\b") ) {
+        Write-Host "pyenv does not provide Python version '$ver'"
+        return $false
+    }
+    return $true
+}
+
+function Lookup-pyenv-Cache {
+<#
+.SYNOPSIS
+Consult the pyenv local list of supported Python versions whether $ver is provided.
+If not, determine whether our local pyenv list should be updated and re-check
+after the update.
+
+We generally try to avoid updating the local pyenv list because it is slow.
+The only time we ever consider updating is when the thought-after Python version
+in $ver does not show up in our local list. At that point we consider updating
+the cache, but only if the last check is older than 12h.
+
+Parameters:
+    $ver: the version of Python we're looking for.
+
+Return value:
+    $true: if $ver can be provided by pyenv
+    $false: otherwise
+#>
+    param (
+        [Parameter(
+            Mandatory = $true,
+            Position = 1,
+            HelpMessage = "Python version to look for in pyenv local list")]
+        [string]$ver,
+
+        [Parameter(
+            Mandatory = $true,
+            Position = 2,
+            HelpMessage = "Path to the installer root folder")]
+        [string]$QINST_ROOT_DIR
+    )
+
+
+    $ret = Check-pyenv-List $ver
+    Write-Host $ret
+    if ( $ret ) {
+        # Python $ver is supported
+        Write-Host "super"
+        return $true
+    }
+
+    Write-Host "don't have"
+    # If we fall through here, then pyenv's local list of supported Python
+    # versions does not contain $ver.
+
+    $stamp = Join-Path $QINST_ROOT_DIR -ChildPath 'stamp.txt' # timestamp file
+    $format = "yyyy-MM-dd_HH:mm:ss"  # timestamp format
+
+    $need_refesh = $false  # $true if pyenv cache is outdated
+
+    if (!(Test-Path $stamp)) {
+        # $stamp file does not exist, we never refreshed the cache
+        $need_refresh = $true
+    } else {
+        # $stamp exists, determine whether the last check is past long enough
+        # to warrant re-checking.
+        $found = switch -File $stamp -RegEx {
+            '^\d\d\d\d-\d\d-\d\d_\d\d:\d\d:\d\d$' {
+                $timestamp = $matches[0]
+                $true
+                break }
+            }
+        if ( !$found ) {
+            # $stamp does not contain a valid timestamp -> error out
+            Write-Host "error!"
+        }
+        # If we fall through here we have date/time of last check in $timestamp
+        $last_checked = [datetime]::ParseExact($timestamp, $format, $null)
+        $now = Get-Date
+        $hours_since_last_check = ($now - $last_checked).TotalHours
+        if ($hours_since_last_check -gt 12) {
+            $need_refresh = $true
+        }
+    }
+
+    if ( $need_refresh ) {
+        Write-Host "Your pywin cache was not updated within the last 12 hours."
+        Write-Host "Updating now, which may take some time..."
+        # check ...
+        try {
+            & pyenv update
+        }
+        catch {
+            Log-Err 'fatal' 'pyenv update' $($_.Exception.Message)
+        }
+        # Update $stamp with new timestamp
+        $now.ToString($format) | Out-File -FilePath ".\$stamp"
+    }
+
+    # If we fall through here, the pyenv cache update succeeded and we can try
+    # one last time.
+    return (Check-pyenv-List $ver)
+}
+
 
 #
 # Main
@@ -277,39 +397,39 @@ if ( !(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
 }
 
 #
-# Python
+# Installer root dir and enclave folder
 #
-Write-Header "Step 3: Install Python $python_version"
-$QINST_ROOT = "${env:LOCALAPPDATA}\qiskit_windows_installer"
-if (!(Test-Path $QINST_ROOT)){
-    New-Item -Path "$QINST_ROOT" -ItemType Directory
+Write-Header "Step 3: set up installer root folder"
+$QINST_ROOT_DIR = "${env:LOCALAPPDATA}\qiskit_windows_installer"
+if (!(Test-Path $QINST_ROOT_DIR)){
+    New-Item -Path "$QINST_ROOT_DIR" -ItemType Directory
 }
 
-$qinst_root_obj = get-item "$QINST_ROOT"
+$qinst_root_obj = get-item "$QINST_ROOT_DIR"
 
-# Check that $QINST_ROOT is a folder and not a file. Required if
+# Check that $QINST_ROOT_DIR is a folder and not a file. Required if
 # the name already pre-existed in the filesystem.
 if ( !($qinst_root_obj.PSIsContainer) ) {
     $err_msg = (
-        "$QINST_ROOT is not a folder.",
-        "Please move $QINST_ROOT out of the way and re-run the script."
+        "$QINST_ROOT_DIR is not a folder.",
+        "Please move $QINST_ROOT_DIR out of the way and re-run the script."
         ) -join "`r`n"
     Fatal-Error $err_msg 1
 } 
 
-# Create the enclave folder $QINST_ROOT\$qwi_vstr. This is from where we
+# Create the enclave folder $QINST_ROOT_DIR\$qwi_vstr. This is from where we
 # set up the virtual environment.
 Write-Header "Step 4: set up enclave folder"
 try {
-    $QINST_ENCLAVE = Join-Path $QINST_ROOT -ChildPath $qwi_vstr
-    if (!(Test-Path $QINST_ENCLAVE)){
-         $err = New-Item -Path "$QINST_ENCLAVE" -ItemType Directory
+    $QINST_ENCLAVE_DIR = Join-Path $QINST_ROOT_DIR -ChildPath $qwi_vstr
+    if (!(Test-Path $QINST_ENCLAVE_DIR)){
+         $err = New-Item -Path "$QINST_ENCLAVE_DIR" -ItemType Directory
     }
-    $err = Set-Location -Path "$QINST_ENCLAVE"
+    $err = Set-Location -Path "$QINST_ENCLAVE_DIR"
 }
 catch {
     $err_msg = (
-        "Unable to cd into $QINST_ENCLAVE.",
+        "Unable to cd into $QINST_ENCLAVE_DIR.",
         "Manual intervention required."
         ) -join "`r`n"
     Fatal-Error $err_msg 1  
@@ -317,30 +437,31 @@ catch {
 
 #
 # We arrived in the enclave. Now
+# (0) Make sure that pyenv supported Python list is up-to-date
 # (1) Check that the Python version asked by the user exists in pyenv
 # (2) Install the Python version asked by the user
 # (3) create the bootstrap venv that contains pipenv etc.
 # (4) Use pipenv to create the ``official'' venv visible to the user in VSCode
 #
 
-Write-Header "Step 5: Set up Python $python_version for venv"
-$versions = Invoke-Command { pyenv install -l } `
-     -ErrorAction SilentlyContinue `
-     -ErrorVariable err_py_list
-# For the regexp match, the dots in the version string are meta-chars
-# that we need to escape:
-$version_pattern = [regex]::Escape($python_version)
-# \b means we only match on word boundaries.
-if (!$versions -match "\b${version_pattern}\b") {
-    $err_py_ver = "pyenv does not provide Python version '$python_version'"
+Write-Header "Step 4a: Check if pyenv supports Python $python_version"
+if ( !(Lookup-pyenv-Cache "2323python_version" $QINST_ROOT_DIR) ) {
+    $err_msg = (
+        "Requested Python version $python_version not available with pyenv.",
+        "Please check manually on Python.org"
+        ) -join "`r`n"
+    Fatal-Error $err_msg 1    
 }
+
+Write-Header "Step 5: Set up Python $python_version for venv"
+
 Invoke-Command { pyenv install $python_version } `
     -ErrorAction SilentlyContinue `
     -ErrorVariable err_py_inst
 Invoke-Command { pyenv local $python_version } `
     -ErrorAction SilentlyContinue `
     -ErrorVariable err_py_setlocal
-Log-Err 'fatal' 'pyenv Python setup in enclave' $err_py_list $err_py_ver $err_py_inst $err_py_setlocal
+Log-Err 'fatal' 'pyenv Python setup in enclave' $err_py_inst $err_py_setlocal
 
 # Make sure that user's '.virtualenvs' folder exists or otherwise create it.
 $DOT_VENVS_DIR = Join-Path ${env:USERPROFILE} -ChildPath '.virtualenvs'

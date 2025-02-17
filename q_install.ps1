@@ -238,7 +238,7 @@ function Check-pyenv-List {
         [string]$ver
     )
     try {
-        $ret = & pyenv install -l
+        $versions = & pyenv install -l
     }
     catch {
         Log-Err 'fatal' 'pyenv install -l' $($_.Exception.Message)
@@ -248,9 +248,10 @@ function Check-pyenv-List {
     $version_pattern = [regex]::Escape($ver)
     # \b means we only match on word boundaries.
     if ( !($versions -match "\b${version_pattern}\b") ) {
-        Write-Host "pyenv does not provide Python version '$ver'"
+        Write-Host "Check: pyenv does not provide Python version '$ver'"
         return $false
     }
+    Write-Host "Check: pyenv provides Python version '$ver'"
     return $true
 }
 
@@ -287,23 +288,22 @@ Return value:
         [string]$QINST_ROOT_DIR
     )
 
-
-    $ret = Check-pyenv-List $ver
-    Write-Host $ret
-    if ( $ret ) {
+    if ( (Check-pyenv-List $ver) ) {
         # Python $ver is supported
-        Write-Host "super"
+        Write-Host "fine"
         return $true
     }
 
-    Write-Host "don't have"
+    Write-Host "don't have that version"
     # If we fall through here, then pyenv's local list of supported Python
     # versions does not contain $ver.
 
     $stamp = Join-Path $QINST_ROOT_DIR -ChildPath 'stamp.txt' # timestamp file
+    Write-Host "The timestamp goes to $stamp"
     $format = "yyyy-MM-dd_HH:mm:ss"  # timestamp format
 
-    $need_refesh = $false  # $true if pyenv cache is outdated
+    $need_refesh = $false  # Will be set to $true if pyenv cache is outdated
+    $now = Get-Date
 
     if (!(Test-Path $stamp)) {
         # $stamp file does not exist, we never refreshed the cache
@@ -319,11 +319,14 @@ Return value:
             }
         if ( !$found ) {
             # $stamp does not contain a valid timestamp -> error out
-            Write-Host "error!"
+            $err_args = 'fatal',
+                'reading out timestamp of last pyenv cache update',
+                'The timestamp file is corrupted.',
+                "Path: $stamp"
+            Log-Err @err_args
         }
         # If we fall through here we have date/time of last check in $timestamp
-        $last_checked = [datetime]::ParseExact($timestamp, $format, $null)
-        $now = Get-Date
+        $last_checked = [datetime]::ParseExact($timestamp, $format, $null)    
         $hours_since_last_check = ($now - $last_checked).TotalHours
         if ($hours_since_last_check -gt 12) {
             $need_refresh = $true
@@ -333,20 +336,24 @@ Return value:
     if ( $need_refresh ) {
         Write-Host "Your pywin cache was not updated within the last 12 hours."
         Write-Host "Updating now, which may take some time..."
-        # check ...
         try {
-            & pyenv update
+            $discard = & pyenv update
         }
         catch {
             Log-Err 'fatal' 'pyenv update' $($_.Exception.Message)
         }
         # Update $stamp with new timestamp
-        $now.ToString($format) | Out-File -FilePath ".\$stamp"
+        $now.ToString($format) | Out-File -FilePath $stamp
+
+        # Cache update succeeded, test one more time and return result
+        return Check-pyenv-List $ver
     }
 
-    # If we fall through here, the pyenv cache update succeeded and we can try
-    # one last time.
-    return (Check-pyenv-List $ver)
+    # If we fall through here, the cache update was not necessary. Thus
+    # there's no point in another lookup.
+    Write-Host "The pywin cache was already updated within the last 12 hours."
+    Write-Host "No further update was attempted."
+    return $false
 }
 
 

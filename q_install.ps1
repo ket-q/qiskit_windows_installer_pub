@@ -104,12 +104,12 @@ Parameters:
     Write-Host $sep
     $kind = $(If ($firstArg -eq 'fatal') {"ERROR"} Else {"WARNING"})
     $ending = $(If ($var_count -gt 1) {"s"} Else {""})
-    Write-Host "${kind}${ending} from '${secondArg}':"
-    #'$firstArg: {0}' -f $firstArg
+    Write-Host "${kind}${ending} from ${secondArg}:"
     $count = 0
     foreach ($listArg in $listArgs) {
         Write-Host $sep
-        'Var[{0}]: {1}' -f $count, $(If ($listArg) {$listArg} Else {"OK"})
+        $err_str = $(If ($listArg) {$listArg} Else {"OK"})
+        Write-Host $('Err[{0}]: {1}' -f $count, $err_str)
         $count++
     }
     Write-Host $sep

@@ -248,10 +248,10 @@ function Check-pyenv-List {
     $version_pattern = [regex]::Escape($ver)
     # \b means we only match on word boundaries.
     if ( !($versions -match "\b${version_pattern}\b") ) {
-        Write-Host "Check: pyenv does not provide Python version '$ver'"
+        Write-Host "pyenv does not list Python version '$ver'"
         return $false
     }
-    Write-Host "Check: pyenv provides Python version '$ver'"
+    Write-Host "pyenv lists Python version '$ver'"
     return $true
 }
 
@@ -290,16 +290,13 @@ Return value:
 
     if ( (Check-pyenv-List $ver) ) {
         # Python $ver is supported
-        Write-Host "fine"
         return $true
     }
 
-    Write-Host "don't have that version"
     # If we fall through here, then pyenv's local list of supported Python
     # versions does not contain $ver.
 
     $stamp = Join-Path $QINST_ROOT_DIR -ChildPath 'stamp.txt' # timestamp file
-    Write-Host "The timestamp goes to $stamp"
     $format = "yyyy-MM-dd_HH:mm:ss"  # timestamp format
 
     $need_refesh = $false  # Will be set to $true if pyenv cache is outdated
@@ -333,28 +330,30 @@ Return value:
         }
     }
 
-    if ( $need_refresh ) {
-        Write-Host "Your pywin cache was not updated within the last 12 hours."
-        Write-Host "Updating now, which may take some time..."
-        try {
-            $discard = & pyenv update
-        }
-        catch {
-            Log-Err 'fatal' 'pyenv update' $($_.Exception.Message)
-        }
-        # Update $stamp with new timestamp
-        $now.ToString($format) | Out-File -FilePath $stamp
-
-        # Cache update succeeded, test one more time and return result
-        return Check-pyenv-List $ver
+    if ( !$need_refresh ) {
+        # A cache update was not necessary. Thus
+        # there's no point in another lookup and we give up.
+        Write-Host "pywin cache already updated within the last 12 hours."
+        Write-Host "No further update was attempted."
+        return $false
     }
 
-    # If we fall through here, the cache update was not necessary. Thus
-    # there's no point in another lookup.
-    Write-Host "The pywin cache was already updated within the last 12 hours."
-    Write-Host "No further update was attempted."
-    return $false
+    # If we fall through here, the cache update and re-lookup is required
+    Write-Host "Your pywin cache was not updated within the last 12 hours."
+    Write-Host "Updating now, which may take some time..."
+    try {
+        $discard = & pyenv update
+    }
+    catch {
+        Log-Err 'fatal' 'pyenv update' $($_.Exception.Message)
+    }
+    # Update $stamp with new timestamp
+    $now.ToString($format) | Out-File -FilePath $stamp
+
+    # Cache update succeeded, test one more time and return result
+    return Check-pyenv-List $ver
 }
+
 
 
 #
@@ -452,12 +451,13 @@ catch {
 #
 
 Write-Header "Step 4a: Check if pyenv supports Python $python_version"
-if ( !(Lookup-pyenv-Cache "2323python_version" $QINST_ROOT_DIR) ) {
+if ( !(Lookup-pyenv-Cache $python_version $QINST_ROOT_DIR) ) {
     $err_msg = (
         "Requested Python version $python_version not available with pyenv.",
-        "Please check manually on Python.org"
+        "Please check manually on Python.org if you believe that Python",
+        "version $python_version should be available."
         ) -join "`r`n"
-    Fatal-Error $err_msg 1    
+    Log-Err 'fatal' "availability-check of Python $python_version" $err_msg    
 }
 
 Write-Header "Step 5: Set up Python $python_version for venv"

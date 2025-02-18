@@ -580,7 +580,7 @@ catch {
 # Update pip of venv
 Write-Header "Step 7: update pip of venv $MY_VENV_DIR"
 try {
-    $e = & python -m pip install --upgrade pip
+    & python -m pip install --upgrade pip
 }
 catch {
     Log-Err 'fatal' 'Update pip of venv $MY_VENV_DIR' $($_.Exception.Message)
@@ -589,7 +589,7 @@ catch {
 # Install ipykernel module in venv
 Write-Header "Step 8: install ipykernel module in venv $MY_VENV_DIR"
 try {
-    $e = & pip install ipykernel
+    & pip install ipykernel
 }
 catch {
     $err = $($_.Exception.Message)
@@ -602,7 +602,7 @@ catch {
 # Install Qiskit in venv
 Write-Header "Step 9: install Qiskit in venv $MY_VENV_DIR"
 try {   
-    $e = & pip install -r $requirements_file
+    & pip install -r $requirements_file
 }
 catch {
     $err = $($_.Exception.Message)
@@ -619,7 +619,7 @@ try {
         "--user",
         "--name=$qwi_vstr",
         "--display-name", "`"$qwi_vstr`""
-    $e = & python $args
+    & python $args
 }
 catch {
     $err = $($_.Exception.Message)

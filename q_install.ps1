@@ -6,7 +6,7 @@ $python_version = "3.12.9" # 3.13 not working because ray requires Python 3.12
 $qiskit_version = "1.3.2"
 # Name of venv in .virtualenvs
 $qwi_vstr = "qiskit_" + $qiskit_version.Replace(".", "_")
-# Name of the requirements.txt file to download from GitHub:
+# Name and URL of the requirements.txt file to download from GitHub:
 $requirements_file = "latest_requirements.txt"
 $req_URL = "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}"
 
@@ -279,7 +279,7 @@ function Check-pyenv-List {
         Write-Host "pyenv does not list Python version '$ver'"
         return $false
     }
-    Write-Host "pyenv lists Python version '$ver'"
+    Write-Host "pyenv supports Python version '$ver'"
     return $true
 }
 
@@ -559,17 +559,6 @@ catch {
 
 # Download the requirements.txt file for the new venv
 Download-File $req_URL ${requirements_file}
-#    "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}" `
-#    ${requirements_file}
-
-# w/o pipenv (rationale: pipenv is extremely slow in installing packages):
-# pyenv exec python -m venv C:\Users\bburg\.virtualenvs\my_test
-# cd C:\Users\bburg\.virtualenvs\  # not needed
-# .\my_test\Scripts\activate
-# (my_test) PS C:\Users\bburg> python -m pip install --upgrade pip
-# pip install ipykernel
-# pip install -r requirements.txt
-# python -m ipykernel install --user --name=my_qiskit --display-name "my_qiskit"  # restart VSCode for Jupyter kernel to become visible
 
 # Create venv
 Write-Header "Step 6: Set up venv $MY_VENV_DIR"
@@ -591,37 +580,35 @@ catch {
 # Update pip of venv
 Write-Header "Step 7: update pip of venv $MY_VENV_DIR"
 try {
-    & python -m pip install --upgrade pip
+    $e = & python -m pip install --upgrade pip
 }
 catch {
-    Log-Err 'fatal' 'Update pip of venv $MY_VENV_DIR' $($_.Exception.Message) 1
+    Log-Err 'fatal' 'Update pip of venv $MY_VENV_DIR' $($_.Exception.Message)
 }
 
 # Install ipykernel module in venv
 Write-Header "Step 8: install ipykernel module in venv $MY_VENV_DIR"
 try {
-    & pip install ipykernel
+    $e = & pip install ipykernel
 }
 catch {
     $err = $($_.Exception.Message)
     $err_args = 'fatal',
         'ipykernel module installation in venv $MY_VENV_DIR',
-        $err,
-        1
+        $err
     Log-Err @err_args
 }
 
 # Install Qiskit in venv
 Write-Header "Step 9: install Qiskit in venv $MY_VENV_DIR"
 try {   
-    & pip install -r $requirements_file
+    $e = & pip install -r $requirements_file
 }
 catch {
     $err = $($_.Exception.Message)
     $err_args = 'fatal',
         'Qiskit installation in venv $MY_VENV_DIR',
-        $err,
-        1
+        $err
     Log-Err @err_args
 }
 
@@ -632,14 +619,13 @@ try {
         "--user",
         "--name=$qwi_vstr",
         "--display-name", "`"$qwi_vstr`""
-    & python $args
+    $e = & python $args
 }
 catch {
     $err = $($_.Exception.Message)
     $err_args = 'fatal',
-        'Qiskit installation in venv $MY_VENV_DIR',
-        $err,
-        1
+        'ipykernel installation in venv $MY_VENV_DIR',
+        $err
     Log-Err @err_args
 }
 

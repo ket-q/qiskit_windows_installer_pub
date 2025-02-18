@@ -8,6 +8,7 @@ $qiskit_version = "1.3.2"
 $qwi_vstr = "qiskit_" + $qiskit_version.Replace(".", "_")
 # Name of the requirements.txt file to download from GitHub:
 $requirements_file = "latest_requirements.txt"
+$req_URL = "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}"
 
 function Write-Header {
     param(
@@ -121,6 +122,33 @@ Parameters:
 }
 
 
+function Log-Status {
+    <#
+    .SYNOPSIS
+    Friendly, informative-character logging only (no error, no warnings).
+    Take a variable-length list of status variables and output them one by one.
+    
+    Parameters:
+    (1) statusVars: one or more status variables of type string to output
+
+    #>
+    param(     
+        [Parameter(
+            Mandatory=$True,
+            ValueFromRemainingArguments=$true,
+            Position = 0
+        )]
+        [AllowEmptyString()]
+        [string[]]
+        $statusVars
+    )
+    
+    foreach ($statusVar in $statusVars) {
+        Write-Host $statusVar
+    }
+}
+
+
 function Refresh-PATH {
     # Reload PATH environment variable to get modifications from program installers
     Write-Host "Refresh-Env old PATH: $env:path"
@@ -168,36 +196,36 @@ function Download-File {
         $target_name
     )
 
-    Write-Host "Downloading $source_URL..."
+    Log-Status "Downloading $source_URL..."
 
     # Use 'curl.exe' which is the Curl version provided on Win 10 and Win 11.
     # (The command 'curl' internally maps to Invoke-WebRequest.)
     try {
-        curl.exe -o $target_name $source_URL
+        $err = & curl.exe --silent -o $target_name $source_URL
     }
     catch {
         $err_msg = (
             "File download from $source_URL failed.",
             "Manual check required."
             ) -join "`r`n"
-        Fatal-Error $err_msg 1
+        Log-Err 'fatal' 'file download attempt' $err_msg
     }
 
-    Write-Host "Download DONE"
+    Log-Status 'Download DONE'
 }
 
 function Install-VSCode {
-    $VSCode_installer = "vscode_installer.exe"
+    $VSCode_installer = 'vscode_installer.exe'
     $VSCode_installer_path = Join-Path ${env:TEMP} -ChildPath $VSCode_installer
     # Download the local installer by appending '-user' to the download URL:
-    $VSCode_URL = "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user"
+    $VSCode_URL = 'https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user'
 
     # Download VSCode
-    Write-Host "Downloading VSCode"
+    Log-Status 'Downloading VSCode'
     Download-File $VSCode_URL $VSCode_installer_path
 
     # Install VSCode
-    Write-Host "Installing VSCode"
+    Log-Status 'Installing VSCode'
     $unattended_args = '/VERYSILENT /MERGETASKS=!runcode'
     Start-Process -FilePath $VSCode_installer_path -ArgumentList $unattended_args -Wait -Passthru
 
@@ -210,11 +238,11 @@ function Install-VSCode-Extension {
         [Parameter(
             Mandatory = $true,
             Position = 1,
-            HelpMessage = "Name of VSCode extension to install")]
+            HelpMessage = 'Name of VSCode extension to install')]
         [string]$ext
     )
-    if ( $(@(code --list-extensions | ? { $_ -match "$ext" }).Count -ge 1) ) {
-        Write-Host "VSCode extension $ext already installed"
+    if ( $(@(code --list-extensions | ? { $_ -match $ext }).Count -ge 1) ) {
+        Log-Status "VSCode extension $ext already installed"
     } else {
         code --install-extension $ext
     }
@@ -285,7 +313,7 @@ Return value:
             Mandatory = $true,
             Position = 2,
             HelpMessage = "Path to the installer root folder")]
-        [string]$QINST_ROOT_DIR
+        [string]$ROOT_DIR
     )
 
     if ( (Check-pyenv-List $ver) ) {
@@ -296,7 +324,7 @@ Return value:
     # If we fall through here, then pyenv's local list of supported Python
     # versions does not contain $ver.
 
-    $stamp = Join-Path $QINST_ROOT_DIR -ChildPath 'stamp.txt' # timestamp file
+    $stamp = Join-Path $ROOT_DIR -ChildPath 'stamp.txt' # timestamp file
     $format = "yyyy-MM-dd_HH:mm:ss"  # timestamp format
 
     $need_refesh = $false  # Will be set to $true if pyenv cache is outdated
@@ -365,77 +393,77 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 #
 # VSCode
 #
-Write-Header "Step 1: Install VSCode"
+Write-Header 'Step 1: Install VSCode'
 if (!(Get-Command code -ErrorAction SilentlyContinue) ) {
-    Write-Host("VSCode not not installed, running installer")
+    Log-Status 'VSCode not not installed, running installer'
     Install-VSCode
     Refresh-PATH
 } else {
-    Write-Host("VSCode already installed")
+    Log-Status 'VSCode already installed'
 }
-Write-Host "Installing VSCode Python extension"
-Install-VSCode-Extension "ms-python.python"
+Log-Status 'Installing VSCode Python extension'
+Install-VSCode-Extension 'ms-python.python'
 
-Write-Host "Installing VSCode Jupyter extension"
-Install-VSCode-Extension "ms-toolsai.jupyter"
+Log-Status 'Installing VSCode Jupyter extension'
+Install-VSCode-Extension 'ms-toolsai.jupyter'
 
 #
 # pyenv-win
 #
-Write-Header "Step 2: Install pyenv-win"
+Write-Header 'Step 2: Install pyenv-win'
 if ( !(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
-    Write-Host("pyenv-win not installed, running installer")
+    Lot-Status 'pyenv-win not installed, running installer'
     Install-pyenv-win
     Refresh-PATH
     Refresh-pyenv_Env
     # Ensure pyenv-win installation succeeded:
     if ( !(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
         $err_msg = (
-            "pyenv-win installation failed.",
-            "Manual check required."
+            'pyenv-win installation failed.',
+            'Manual check required.'
             ) -join "`r`n"
-        Fatal-Error $err_msg 1
+        Log-Err 'fatal' 'pyenv-win installation' $err_msg
     } else {
-        Write-Host("pyenv-win installation succeeded")
+        Log-Status 'pyenv-win installation succeeded'
     }
 } else {
-    Write-Host("pyenv-win already installed")
+    Log-Status 'pyenv-win already installed'
 }
 
 #
-# Installer root dir and enclave folder
+# Set up installer root dir and enclave folder
 #
-Write-Header "Step 3: set up installer root folder"
-$QINST_ROOT_DIR = "${env:LOCALAPPDATA}\qiskit_windows_installer"
-if (!(Test-Path $QINST_ROOT_DIR)){
-    New-Item -Path "$QINST_ROOT_DIR" -ItemType Directory
+Write-Header 'Step 3: set up installer root folder'
+$ROOT_DIR = Join-Path ${env:LOCALAPPDATA} -ChildPath 'qiskit_windows_installer'
+if (!(Test-Path $ROOT_DIR)){
+    New-Item -Path $ROOT_DIR -ItemType Directory
 }
 
-$qinst_root_obj = get-item "$QINST_ROOT_DIR"
+$qinst_root_obj = get-item $ROOT_DIR
 
-# Check that $QINST_ROOT_DIR is a folder and not a file. Required if
+# Check that $ROOT_DIR is a folder and not a file. Required if
 # the name already pre-existed in the filesystem.
 if ( !($qinst_root_obj.PSIsContainer) ) {
     $err_msg = (
-        "$QINST_ROOT_DIR is not a folder.",
-        "Please move $QINST_ROOT_DIR out of the way and re-run the script."
+        "$ROOT_DIR is not a folder.",
+        "Please move $ROOT_DIR out of the way and re-run the script."
         ) -join "`r`n"
     Fatal-Error $err_msg 1
 } 
 
-# Create the enclave folder $QINST_ROOT_DIR\$qwi_vstr. This is from where we
+# Create the enclave folder $ROOT_DIR\$qwi_vstr. This is from where we
 # set up the virtual environment.
-Write-Header "Step 4: set up enclave folder"
+Write-Header 'Step 4: set up enclave folder'
 try {
-    $QINST_ENCLAVE_DIR = Join-Path $QINST_ROOT_DIR -ChildPath $qwi_vstr
-    if (!(Test-Path $QINST_ENCLAVE_DIR)){
-         $err = New-Item -Path "$QINST_ENCLAVE_DIR" -ItemType Directory
+    $ENCLAVE_DIR = Join-Path $ROOT_DIR -ChildPath $qwi_vstr
+    if (!(Test-Path $ENCLAVE_DIR)) {
+         $err = New-Item -Path $ENCLAVE_DIR -ItemType Directory
     }
-    $err = Set-Location -Path "$QINST_ENCLAVE_DIR"
+    $err = Set-Location -Path $ENCLAVE_DIR
 }
 catch {
     $err_msg = (
-        "Unable to cd into $QINST_ENCLAVE_DIR.",
+        "Unable to cd into $ENCLAVE_DIR.",
         "Manual intervention required."
         ) -join "`r`n"
     Fatal-Error $err_msg 1  
@@ -451,7 +479,7 @@ catch {
 #
 
 Write-Header "Step 4a: Check if pyenv supports Python $python_version"
-if ( !(Lookup-pyenv-Cache $python_version $QINST_ROOT_DIR) ) {
+if ( !(Lookup-pyenv-Cache $python_version $ROOT_DIR) ) {
     $err_msg = (
         "Requested Python version $python_version not available with pyenv.",
         "Please check manually on Python.org if you believe that Python",
@@ -461,22 +489,21 @@ if ( !(Lookup-pyenv-Cache $python_version $QINST_ROOT_DIR) ) {
 }
 
 Write-Header "Step 5: Set up Python $python_version for venv"
-
-Invoke-Command { pyenv install $python_version } `
-    -ErrorAction SilentlyContinue `
-    -ErrorVariable err_py_inst
-Invoke-Command { pyenv local $python_version } `
-    -ErrorAction SilentlyContinue `
-    -ErrorVariable err_py_setlocal
-Log-Err 'fatal' 'pyenv Python setup in enclave' $err_py_inst $err_py_setlocal
+try {
+    $err = & pyenv install $python_version
+    $err = & pyenv local $python_version
+}
+catch {
+    Log-Err 'fatal' 'pyenv Python setup in enclave' $($_.Exception.Message)   
+}
 
 # Make sure that user's '.virtualenvs' folder exists or otherwise create it.
 $DOT_VENVS_DIR = Join-Path ${env:USERPROFILE} -ChildPath '.virtualenvs'
 if (!(Test-Path $DOT_VENVS_DIR)){
-    New-Item -Path "$DOT_VENVS_DIR" -ItemType Directory
+    New-Item -Path $DOT_VENVS_DIR -ItemType Directory
 }
 
-$dot_venvs_dir_obj = get-item "$DOT_VENVS_DIR"
+$dot_venvs_dir_obj = get-item $DOT_VENVS_DIR
 
 # Check that '.virtualenvs' is a folder and not a file. Required if
 # the name already pre-existed in the filesystem.
@@ -485,7 +512,7 @@ if ( !($dot_venvs_dir_obj.PSIsContainer) ) {
         "$DOT_VENVS_DIR is not a folder.",
         "Please move $DOT_VENVS_DIR out of the way and re-run the script."
         ) -join "`r`n"
-    Fatal-Error $err_msg 1
+    Log-Err 'fatal' '.virtualenvs check' $err_msg
 }
 
 # Test whether a venv of name $qwi_vstr already exists and delete it.
@@ -513,31 +540,27 @@ catch {
     Log-Err 'fatal' $err_0 $err_1
 }
 
-
-$boot_venv_name = "venv_boot"
-
-
-# Create and enter enclave folder $QINST_ROOT\$qwi_vstr. This is from where we
-# set up the virtual environment in .virtualenvs.
+# Create and enter enclave folder $ROOT_DIR\$qwi_vstr. This is from where we
+# will set up the virtual environment in .virtualenvs
 try {
-    $QINST_ENCLAVE = Join-Path $QINST_ROOT -ChildPath $qwi_vstr
-    if (!(Test-Path $QINST_ENCLAVE)){
-         New-Item -Path "$QINST_ENCLAVE" -ItemType Directory
+    $ENCLAVE_DIR = Join-Path $ROOT_DIR -ChildPath $qwi_vstr
+    if ( !(Test-Path $ENCLAVE_DIR) ) {
+         New-Item -Path $ENCLAVE -ItemType Directory
     }
-    Set-Location -Path "$QINST_ENCLAVE"
+    Set-Location -Path $ENCLAVE_DIR
 }
 catch {
     $err_msg = (
-        "Unable to cd into $QINST_ENCLAVE.",
+        "Unable to cd into $ENCLAVE_DIR.",
         "Manual intervention required."
         ) -join "`r`n"
-    Fatal-Error $err_msg 1  
+    Log-Err 'fatal' 'cd into enclave folder' $err_msg  
 }
 
 # Download the requirements.txt file for the new venv
-Download-File `
-    "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}" `
-    "${requirements_file}"
+Download-File $req_URL ${requirements_file}
+#    "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}" `
+#    ${requirements_file}
 
 # w/o pipenv (rationale: pipenv is extremely slow in installing packages):
 # pyenv exec python -m venv C:\Users\bburg\.virtualenvs\my_test

@@ -7,7 +7,8 @@ $qiskit_version = "1.3.2"
 # Name of venv in .virtualenvs
 $qwi_vstr = "qiskit_" + $qiskit_version.Replace(".", "_")
 # Name and URL of the requirements.txt file to download from GitHub:
-$requirements_file = "latest_requirements.txt"
+#$requirements_file = "latest_requirements.txt"
+$requirements_file = "symeng_requirements.txt"
 $req_URL = "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}"
 
 function Write-Header {
@@ -279,7 +280,7 @@ function Check-pyenv-List {
         Write-Host "pyenv does not list Python version '$ver'"
         return $false
     }
-    Write-Host "pyenv supports Python version '$ver'"
+    Write-Host "pyenv supports Python version $ver"
     return $true
 }
 

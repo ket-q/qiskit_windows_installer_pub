@@ -499,7 +499,7 @@ catch {
 }
 
 # # Make sure that user's '.virtualenvs' folder exists or otherwise create it.
-# $DOT_VENVS_DIR = Join-Path ${env:USERPROFILE} -ChildPath '.virtualenvs'
+$DOT_VENVS_DIR = Join-Path ${env:USERPROFILE} -ChildPath '.virtualenvs'
 # if (!(Test-Path $DOT_VENVS_DIR)){
 #     New-Item -Path $DOT_VENVS_DIR -ItemType Directory
 # }

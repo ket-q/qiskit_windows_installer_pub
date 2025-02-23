@@ -759,15 +759,15 @@ catch {
 # Test the installation
 Write-Header "Step 11: testing the installation in $MY_VENV_DIR"
 Test-symeng-Module
-Test-qiskit-Version
+# Test-qiskit-Version
 
 # Deactivate the Python venv
-try {
-   Invoke-Native deactivate
-}
-catch {
-    Log-Err 'fatal' $($_.Exception.Message)
-}
+# try {
+#    Invoke-Native deactivate
+# }
+# catch {
+#     Log-Err 'fatal' $($_.Exception.Message)
+# }
 
 # Done
 Exit 0

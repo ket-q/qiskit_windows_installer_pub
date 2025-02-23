@@ -479,7 +479,7 @@ catch {
 # (4) Use pipenv to create the ``official'' venv visible to the user in VSCode
 #
 
-# Write-Header "Step 4a: Check if pyenv supports Python $python_version"
+Write-Header "Step 4a: Check if pyenv supports Python $python_version"
 if ( !(Lookup-pyenv-Cache $python_version $ROOT_DIR) ) {
     $err_msg = (
         "Requested Python version $python_version not available with pyenv.",
@@ -500,21 +500,21 @@ catch {
 
 # # Make sure that user's '.virtualenvs' folder exists or otherwise create it.
 $DOT_VENVS_DIR = Join-Path ${env:USERPROFILE} -ChildPath '.virtualenvs'
-# if (!(Test-Path $DOT_VENVS_DIR)){
-#     New-Item -Path $DOT_VENVS_DIR -ItemType Directory
-# }
+if (!(Test-Path $DOT_VENVS_DIR)){
+    New-Item -Path $DOT_VENVS_DIR -ItemType Directory
+}
 
-# $dot_venvs_dir_obj = get-item $DOT_VENVS_DIR
+$dot_venvs_dir_obj = get-item $DOT_VENVS_DIR
 
-# # Check that '.virtualenvs' is a folder and not a file. Required if
-# # the name already pre-existed in the filesystem.
-# if ( !($dot_venvs_dir_obj.PSIsContainer) ) {
-#     $err_msg = (
-#         "$DOT_VENVS_DIR is not a folder.",
-#         "Please move $DOT_VENVS_DIR out of the way and re-run the script."
-#         ) -join "`r`n"
-#     Log-Err 'fatal' '.virtualenvs check' $err_msg
-# }
+# Check that '.virtualenvs' is a folder and not a file. Required if
+# the name already pre-existed in the filesystem.
+if ( !($dot_venvs_dir_obj.PSIsContainer) ) {
+    $err_msg = (
+        "$DOT_VENVS_DIR is not a folder.",
+        "Please move $DOT_VENVS_DIR out of the way and re-run the script."
+        ) -join "`r`n"
+    Log-Err 'fatal' '.virtualenvs check' $err_msg
+}
 
 # Test whether a venv of name $qwi_vstr already exists and delete it.
 # Note 1: VSCode etc. should not use the venv in that moment, but we don't

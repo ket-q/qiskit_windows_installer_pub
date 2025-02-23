@@ -480,14 +480,14 @@ catch {
 #
 
 # Write-Header "Step 4a: Check if pyenv supports Python $python_version"
-# if ( !(Lookup-pyenv-Cache $python_version $ROOT_DIR) ) {
-#     $err_msg = (
-#         "Requested Python version $python_version not available with pyenv.",
-#         "Please check manually on Python.org if you believe that Python",
-#         "version $python_version should be available."
-#         ) -join "`r`n"
-#     Log-Err 'fatal' "availability-check of Python $python_version" $err_msg    
-# }
+if ( !(Lookup-pyenv-Cache $python_version $ROOT_DIR) ) {
+    $err_msg = (
+        "Requested Python version $python_version not available with pyenv.",
+        "Please check manually on Python.org if you believe that Python",
+        "version $python_version should be available."
+        ) -join "`r`n"
+    Log-Err 'fatal' "availability-check of Python $python_version" $err_msg    
+}
 
 Write-Header "Step 5: Set up Python $python_version for venv"
 try {

@@ -613,22 +613,22 @@ catch {
     Log-Err @err_args
 }
 
-# # Install Jupyter server in venv
-# Write-Header "Step 10: install ipykernel kernel in venv $MY_VENV_DIR"
-# try {
-#     $args = "-m", "ipykernel", "install",
-#         "--user",
-#         "--name=$qwi_vstr",
-#         "--display-name", "`"$qwi_vstr`""
-#     & python $args
-# }
-# catch {
-#     $err = $($_.Exception.Message)
-#     $err_args = 'fatal',
-#         'ipykernel installation in venv $MY_VENV_DIR',
-#         $err
-#     Log-Err @err_args
-# }
+# Install Jupyter server in venv
+Write-Header "Step 10: install ipykernel kernel in venv $MY_VENV_DIR"
+try {
+    $args = "-m", "ipykernel", "install",
+        "--user",
+        "--name=$qwi_vstr",
+        "--display-name", "`"$qwi_vstr`""
+    & python $args
+}
+catch {
+    $err = $($_.Exception.Message)
+    $err_args = 'fatal',
+        'ipykernel installation in venv $MY_VENV_DIR',
+        $err
+    Log-Err @err_args
+}
 
 # Done
 Exit 0

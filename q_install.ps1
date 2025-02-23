@@ -490,7 +490,7 @@ Import the qiskit version number, and compare it to the expected version.
     if ( $v -eq $qiskit_version ) {
         Write-Host "Detected Qiskit version number $v"
     } else {
-        Log-Err 'warn' 'checking Qiskit version number failed'
+        Log-Err 'warn' 'Qiskit version number check' 'Failed'
     }
 }
 

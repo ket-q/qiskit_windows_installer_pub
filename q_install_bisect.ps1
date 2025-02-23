@@ -579,13 +579,13 @@ catch {
 #
 
 # # Update pip of venv
-# Write-Header "Step 7: update pip of venv $MY_VENV_DIR"
-# try {
-#     & python -m pip install --upgrade pip
-# }
-# catch {
-#     Log-Err 'fatal' 'Update pip of venv $MY_VENV_DIR' $($_.Exception.Message)
-# }
+Write-Header "Step 7: update pip of venv $MY_VENV_DIR"
+try {
+    & python -m pip install --upgrade pip
+}
+catch {
+    Log-Err 'fatal' 'Update pip of venv $MY_VENV_DIR' $($_.Exception.Message)
+}
 
 # # Install ipykernel module in venv
 Write-Header "Step 8: install ipykernel module in venv $MY_VENV_DIR"

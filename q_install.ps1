@@ -313,7 +313,7 @@ function Install-pyenv-win {
     # Cleanup
     Remove-Item $target_file
 
-    Log-Status 'DONE'
+    # Log-Status 'DONE'
 }
 
 

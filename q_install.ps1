@@ -154,33 +154,32 @@ function Log-Status {
 
 function Refresh-PATH {
     # Reload PATH environment variable to get modifications from program installers
-    Write-Host "Refresh-Env old PATH: $env:path"
+    Write-Host "Refresh-Env old PATH: $env:Path"
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") +
-                ";" +
-                [System.Environment]::GetEnvironmentVariable("Path","User")
-    Write-Host "Refresh-Env new PATH: $env:path"
+              ";" +
+              [System.Environment]::GetEnvironmentVariable("Path","User")
+    Write-Host "Refresh-Env new PATH: $env:Path"
 }
 
 
 function Refresh-pyenv_Env {
     # Reload PyEnv environment variable (except PATH) to get modifications from installer
     Write-Host "Refresh-Env old PYENV: $env:PYENV"
-    $env:Path = [System.Environment]::GetEnvironmentVariable("PYENV","Machine") +
-                ";" +
-                [System.Environment]::GetEnvironmentVariable("PYENV","User")
+    $env:PYENV = [System.Environment]::GetEnvironmentVariable("PYENV","Machine") +
+               ";" +
+               [System.Environment]::GetEnvironmentVariable("PYENV","User")
     Write-Host "Refresh-Env new PYENV: $env:PYENV"
 
-    Write-Host "Refresh-Env old PYENV_ROOT: $env:PYENV_ROOT"
-    $env:Path = [System.Environment]::GetEnvironmentVariable("PYENV_ROOT","Machine") +
-                ";" +
-                [System.Environment]::GetEnvironmentVariable("PYENV_ROOT","User")
-    Write-Host "Refresh-Env new PYENV_ROOT: $env:PYENV_ROOT"
+    #
+    # PYENV_ROOT and PYENV_HOME seem to be unpopulated from pyenv-win installer
+    #
+    # Write-Host "Refresh-Env old PYENV_ROOT: $env:PYENV_ROOT"
+    # $env:PYENV_ROOT = [System.Environment]::GetEnvironmentVariable("PYENV_ROOT","User")
+    # Write-Host "Refresh-Env new PYENV_ROOT: $env:PYENV_ROOT"
     
-    Write-Host "Refresh-Env old PYENV_HOME: $env:PYENV_HOME"
-    $env:Path = [System.Environment]::GetEnvironmentVariable("PYENV_HOME","Machine") +
-                ";" +
-                [System.Environment]::GetEnvironmentVariable("PYENV_HOME","User")
-    Write-Host "Refresh-Env new PYENV_HOME: $env:PYENV_HOME"    
+    # Write-Host "Refresh-Env old PYENV_HOME: $env:PYENV_HOME"
+    # $env:PYENV_HOME = [System.Environment]::GetEnvironmentVariable("PYENV_HOME","User")
+    # Write-Host "Refresh-Env new PYENV_HOME: $env:PYENV_HOME"    
 }
 
 
@@ -298,24 +297,19 @@ function Install-VSCode-Extension {
 
 
 function Install-pyenv-win {
-    # Download and install
-    $ProgressPreference = 'SilentlyContinue' # omit progress update to favour fast download time
-    Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/pyenv-win/pyenv-win/master/pyenv-win/install-pyenv-win.ps1" -OutFile "./install-pyenv-win.ps1"; &"./install-pyenv-win.ps1"
 
-    
-    # Log-Status 'Downloading pyenv-win'
-    # $pyenv_win_URL = 'https://raw.githubusercontent.com/pyenv-win/pyenv-win/master/pyenv-win/install-pyenv-win.ps1'
-    # $target_file = 'install-pyenv-win.ps1'
-    # Download-File $pyenv_win_URL $target_file
+    Log-Status 'Downloading pyenv-win'
+    $pyenv_win_URL = 'https://raw.githubusercontent.com/pyenv-win/pyenv-win/master/pyenv-win/install-pyenv-win.ps1'
+    $target_file = 'install-pyenv-win.ps1'
+    Download-File $pyenv_win_URL $target_file
 
-    # Log-Status 'Installing pyenv-win'
-    # Invoke-Native "./${target_file}"
+    Log-Status 'Installing pyenv-win'
+    Invoke-Native "./${target_file}"
 
     # Cleanup
-    $target_file = 'install-pyenv-win.ps1'
     Remove-Item $target_file
 
-    # Log-Status 'DONE'
+    Log-Status 'DONE'
 }
 
 

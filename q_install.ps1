@@ -7,8 +7,8 @@ $qiskit_version = "1.3.2"
 # Name of venv in .virtualenvs
 $qwi_vstr = "testqiskit_" + $qiskit_version.Replace(".", "_")
 # Name and URL of the requirements.txt file to download from GitHub:
-$requirements_file = "requirements_qiskit_1_3_2.txt"
-#$requirements_file = "symeng_requirements.txt"
+#$requirements_file = "requirements_qiskit_1_3_2.txt"
+$requirements_file = "symeng_requirements.txt"
 $req_URL = "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}"
 
 function Write-Header {
@@ -479,7 +479,7 @@ Install-VSCode-Extension 'ms-toolsai.jupyter'
 Write-Header 'Step 2: Install pyenv-win'
 #FIXME: negated cond.
 if ( (Get-Command pyenv -ErrorAction SilentlyContinue) ) {
-    Lot-Status 'pyenv-win not installed, running installer'
+    Log-Status 'pyenv-win not installed, running installer'
     Install-pyenv-win
     Refresh-PATH
     Refresh-pyenv_Env

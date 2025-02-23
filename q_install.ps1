@@ -477,7 +477,8 @@ Install-VSCode-Extension 'ms-toolsai.jupyter'
 # pyenv-win
 #
 Write-Header 'Step 2: Install pyenv-win'
-if ( !(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
+#FIXME: negated cond.
+if ( (Get-Command pyenv -ErrorAction SilentlyContinue) ) {
     Lot-Status 'pyenv-win not installed, running installer'
     Install-pyenv-win
     Refresh-PATH

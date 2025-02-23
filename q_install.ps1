@@ -4,11 +4,12 @@ $PSNativeCommandUseErrorActionPreference = $true
 
 $python_version = '3.12.9' # 3.13 not working because ray requires Python 3.12
 $qiskit_version = '1.3.2'
+
 # Name of venv in .virtualenvs
 $qwi_vstr = 'qiskit_' + $qiskit_version.Replace('.', '_')
 # Name and URL of the requirements.txt file to download from GitHub:
-$requirements_file = 'requirements_qiskit_1_3_2.txt'
-#$requirements_file = "symeng_requirements.txt"
+#$requirements_file = 'requirements_qiskit_1_3_2.txt'
+$requirements_file = "symeng_requirements.txt"
 $req_URL = "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}"
 
 function Write-Header {
@@ -238,8 +239,9 @@ function Download-File {
 
     # Use 'curl.exe' which is the Curl version provided on Win 10 and Win 11.
     # (The command 'curl' internally maps to Invoke-WebRequest.)
+    # -L ... download across redirects
     try {
-        Invoke-Native curl.exe --silent -o $target_name $source_URL
+        Invoke-Native curl.exe --silent -L -o $target_name $source_URL
     }
     catch {
         $err_msg = (
@@ -259,12 +261,14 @@ function Install-VSCode {
     # Download the local installer by appending '-user' to the download URL:
     $VSCode_URL = 'https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user'
 
+    Write-Host $VSCode_installer_path
+
     # Download VSCode
-    Log-Status 'Downloading VSCode'
+    Log-Status 'Downloading VSCode installer'
     Download-File $VSCode_URL $VSCode_installer_path
 
     # Install VSCode
-    Log-Status 'Installing VSCode'
+    Log-Status 'Running VSCode installer'
     $unattended_args = '/VERYSILENT /MERGETASKS=!runcode'
     Start-Process -FilePath $VSCode_installer_path -ArgumentList $unattended_args -Wait -Passthru
 
@@ -332,7 +336,7 @@ function Check-pyenv-List {
         [string]$ver
     )
     try {
-        $versions = & pyenv install -l
+        $versions = Invoke-Native pyenv install -l
     }
     catch {
         Log-Err 'fatal' 'pyenv install -l' $($_.Exception.Message)
@@ -480,7 +484,7 @@ Import the qiskit version number, and compare it to the expected version.
         $v = Invoke-Native python -c $py_cmd
     }
     catch {
-        Log-Err 'fatal' 'Qiskit version test' $($_.Exception.Message)
+        Log-Err 'warn' 'Qiskit version test' $($_.Exception.Message)
     }
 
     if ( $v -eq $qiskit_version ) {
@@ -506,13 +510,24 @@ catch {
 # VSCode
 #
 Write-Header 'Step 1: Install VSCode'
-if (!(Get-Command code -ErrorAction SilentlyContinue) ) {
+if ( !(Get-Command code -ErrorAction SilentlyContinue) ) {
     Log-Status 'VSCode not not installed, running installer'
     Install-VSCode
     Refresh-PATH
+    # Ensure VScode installation succeeded:
+    if ( !(Get-Command code -ErrorAction SilentlyContinue) ) {
+        $err_msg = (
+            'VSCode installation failed.',
+            'Manual check required.'
+            ) -join "`r`n"
+        Log-Err 'fatal' 'VSCode installation' $err_msg
+    } else {
+        Log-Status 'VSCode installation succeeded'
+    }
 } else {
     Log-Status 'VSCode already installed'
 }
+
 Log-Status 'Installing VSCode Python extension'
 Install-VSCode-Extension 'ms-python.python'
 
@@ -523,8 +538,7 @@ Install-VSCode-Extension 'ms-toolsai.jupyter'
 # pyenv-win
 #
 Write-Header 'Step 2: Install pyenv-win'
-#FIXME: negated cond.
-if ( (Get-Command pyenv -ErrorAction SilentlyContinue) ) {
+if ( !(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
     Log-Status 'pyenv-win not installed, running installer'
     Install-pyenv-win
     Refresh-PATH

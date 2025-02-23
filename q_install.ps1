@@ -2,13 +2,13 @@
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 
-$python_version = "3.12.9" # 3.13 not working because ray requires Python 3.12
-$qiskit_version = "1.3.2"
+$python_version = '3.12.9' # 3.13 not working because ray requires Python 3.12
+$qiskit_version = '1.3.2'
 # Name of venv in .virtualenvs
-$qwi_vstr = "testqiskit_" + $qiskit_version.Replace(".", "_")
+$qwi_vstr = 'qiskit_' + $qiskit_version.Replace('.', '_')
 # Name and URL of the requirements.txt file to download from GitHub:
-#$requirements_file = "requirements_qiskit_1_3_2.txt"
-$requirements_file = "symeng_requirements.txt"
+$requirements_file = 'requirements_qiskit_1_3_2.txt'
+#$requirements_file = "symeng_requirements.txt"
 $req_URL = "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}"
 
 function Write-Header {
@@ -460,10 +460,33 @@ installation failures.
     Log-Status 'Testing the symengine Python module'
     try {
         Invoke-Native python -c 'import symengine'
-        Log-Status 'DONE'
+        Log-Status 'PASSED'
     }
     catch {
         Log-Err 'fatal' 'symengine module test' $($_.Exception.Message)
+    }
+}    
+
+
+function Test-qiskit-version {
+<#
+.SYNOPSIS
+Import the qiskit version number, and compare it to the expected version.
+#>
+    Log-Status 'Testing installed Qiskit version number'
+
+    try {
+        $py_cmd = 'from qiskit import __version__; print(__version__)'
+        $v = Invoke-Native python -c $py_cmd
+    }
+    catch {
+        Log-Err 'fatal' 'Qiskit version test' $($_.Exception.Message)
+    }
+
+    if ( $v -eq $qiskit_version ) {
+        Write-Host "Detected Qiskit version number $v"
+    } else {
+        Log-Err 'warn' 'checking Qiskit version number failed'
     }
 }
 
@@ -719,11 +742,18 @@ catch {
     Log-Err @err_args
 }
 
-#
 # Test the installation
-#
+Write-Header "Step 11: testing the installation in $MY_VENV_DIR"
 Test-symeng-Module
+Test-qiskit-Version
 
+# Deactivate the Python venv
+try {
+   Invoke-Native deactivate
+}
+catch {
+    Log-Err 'fatal' $($_.Exception.Message)
+}
 
 # Done
 Exit 0

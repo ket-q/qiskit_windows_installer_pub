@@ -308,7 +308,7 @@ function Install-pyenv-win {
     Download-File $pyenv_win_URL $target_file
 
     Log-Status 'Installing pyenv-win'
-    Invoke-Native $target_file
+    Invoke-Native "./${target_file}"
 
     # Cleanup
     Remove-Item $target_file

@@ -588,17 +588,17 @@ catch {
 # }
 
 # # Install ipykernel module in venv
-# Write-Header "Step 8: install ipykernel module in venv $MY_VENV_DIR"
-# try {
-#     & pip install ipykernel
-# }
-# catch {
-#     $err = $($_.Exception.Message)
-#     $err_args = 'fatal',
-#         'ipykernel module installation in venv $MY_VENV_DIR',
-#         $err
-#     Log-Err @err_args
-# }
+Write-Header "Step 8: install ipykernel module in venv $MY_VENV_DIR"
+try {
+    & pip install ipykernel
+}
+catch {
+    $err = $($_.Exception.Message)
+    $err_args = 'fatal',
+        'ipykernel module installation in venv $MY_VENV_DIR',
+        $err
+    Log-Err @err_args
+}
 
 # Install Qiskit in venv
 Write-Header "Step 9: install Qiskit in venv $MY_VENV_DIR"

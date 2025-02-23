@@ -491,7 +491,7 @@ if ( !(Lookup-pyenv-Cache $python_version $ROOT_DIR) ) {
 
 Write-Header "Step 5: Set up Python $python_version for venv"
 try {
-    #$err = & pyenv install $python_version
+    $err = & pyenv install $python_version
     $err = & pyenv local $python_version
 }
 catch {

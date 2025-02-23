@@ -270,6 +270,8 @@ function Install-VSCode {
 
     # Cleanup
     Remove-Item $VSCode_installer_path
+
+    Log-Status 'DONE'
 }
 
 
@@ -299,15 +301,23 @@ function Install-VSCode-Extension {
 function Install-pyenv-win {
 
     Log-Status 'Downloading pyenv-win'
+
+    $pyenv_installer = 'install-pyenv-win.ps1'
+    $pyenv_installer_path = Join-Path ${env:TEMP} -ChildPath $pyenv_installer
     $pyenv_win_URL = 'https://raw.githubusercontent.com/pyenv-win/pyenv-win/master/pyenv-win/install-pyenv-win.ps1'
-    $target_file = 'install-pyenv-win.ps1'
-    Download-File $pyenv_win_URL $target_file
+
+    Download-File $pyenv_win_URL $pyenv_installer
 
     Log-Status 'Installing pyenv-win'
-    Invoke-Native "./${target_file}"
+    try {
+        Invoke-Native "./${pyenv_installer}"
+    }
+    catch {
+        Log-Err 'fatal' 'pyenv-win installation' $($_.Exception.Message)
+    }
 
     # Cleanup
-    Remove-Item $target_file
+    Remove-Item $pyenv_installer
 
     Log-Status 'DONE'
 }
@@ -439,6 +449,23 @@ Return value:
     return Check-pyenv-List $ver
 }
 
+
+function Test-symeng-Module {
+<#
+.SYNOPSIS
+Import the symengine Python module from the Python interpreter. The symengine
+module is a Python wrapper for a machine-code library and thus error-prone for
+installation failures.
+#>
+    Log-Status 'Testing the symengine Python module'
+    try {
+        Invoke-Native python -c 'import symengine'
+        Log-Status 'DONE'
+    }
+    catch {
+        Log-Err 'fatal' 'symengine module test' $($_.Exception.Message)
+    }
+}
 
 
 #
@@ -691,6 +718,12 @@ catch {
         $err
     Log-Err @err_args
 }
+
+#
+# Test the installation
+#
+Test-symeng-Module
+
 
 # Done
 Exit 0

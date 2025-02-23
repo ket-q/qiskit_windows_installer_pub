@@ -7,7 +7,7 @@ $qiskit_version = "1.3.2"
 # Name of venv in .virtualenvs
 $qwi_vstr = "testqiskit_" + $qiskit_version.Replace(".", "_")
 # Name and URL of the requirements.txt file to download from GitHub:
-$requirements_file = "latest_requirements.txt"
+$requirements_file = "requirements_qiskit_1_3_2.txt"
 #$requirements_file = "symeng_requirements.txt"
 $req_URL = "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}"
 
@@ -184,6 +184,40 @@ function Refresh-pyenv_Env {
 }
 
 
+function Invoke-Native {
+    <#
+    .SYNOPSIS
+    PoSH v. 5 does not automatically check the exit code of native commands.
+
+    Wrap passed native command to check its exit code and throw an exception
+    if non-zero.
+    
+    Parameters:
+    (1) command: the native command to run
+    (2) command arguments: possibly empty list of arguments
+
+    #>
+
+    if ( $args.Count -eq 0) {
+        throw 'Invoke-Native called without arguments'
+    }
+
+    $cmd = $args[0]
+
+    $cmd_args = @()
+    if ($args.Count -gt 1) {
+        $cmd_args = $args[1..($args.Count-1)]
+    }
+
+    & $cmd $cmd_args
+    $err = $LASTEXITCODE
+
+    if ( $err -ne 0 ) {
+        throw "Native command '$cmd $cmd_args' returned $err"
+    }
+}
+
+
 function Download-File {
     param(
         [Parameter(
@@ -206,7 +240,7 @@ function Download-File {
     # Use 'curl.exe' which is the Curl version provided on Win 10 and Win 11.
     # (The command 'curl' internally maps to Invoke-WebRequest.)
     try {
-        $err = & curl.exe --silent -o $target_name $source_URL
+        Invoke-Native curl.exe --silent -o $target_name $source_URL
     }
     catch {
         $err_msg = (

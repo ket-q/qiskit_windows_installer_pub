@@ -5,15 +5,15 @@ $PSNativeCommandUseErrorActionPreference = $true
 $python_version = "3.12.9" # 3.13 not working because ray requires Python 3.12
 $qiskit_version = "1.3.2"
 # Name of venv in .virtualenvs
-$qwi_vstr = "qiskit_" + $qiskit_version.Replace(".", "_")
+$qwi_vstr = "testqiskit_" + $qiskit_version.Replace(".", "_")
 # Name and URL of the requirements.txt file to download from GitHub:
-#$requirements_file = "latest_requirements.txt"
-$requirements_file = "symeng_requirements.txt"
+$requirements_file = "latest_requirements.txt"
+#$requirements_file = "symeng_requirements.txt"
 $req_URL = "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}"
 
 function Write-Header {
     param(
-        [Parameter(Mandatory = $true, Position = 1, HelpMessage = "The message to write")]
+        [Parameter(Mandatory=$true, Position=1, HelpMessage="The message to write")]
         [string]$msg
     )
     $fill = "="*$msg.Length
@@ -22,9 +22,10 @@ function Write-Header {
     Write-Host "====$fill===="
 }
 
+
 function Fatal-Error {
     param(
-        [Parameter(Mandatory = $true, Position = 1, HelpMessage = "The error message to write")]
+        [Parameter(Mandatory=$true, Position=1, HelpMessage="The error message to write")]
         [string]$err_msg,
 
         [Parameter(Mandatory = $true, Position = 2, HelpMessage = "Exit code of the program")]
@@ -42,6 +43,7 @@ function Fatal-Error {
     Exit $err_val
 }
 
+
 function Log-Err {
 <#
 .SYNOPSIS
@@ -58,24 +60,24 @@ Parameters:
 #>
     param(
         [Parameter(
-            Mandatory=$True,
-            Position = 0
+            Mandatory=$true,
+            Position=0
         )]
         [ValidateSet('fatal', 'warn')]
         [string]
         $firstArg = 'fatal',
 
         [Parameter(
-            Mandatory=$True,
-            Position = 1
+            Mandatory=$true,
+            Position=1
         )]
         [string]
         $secondArg,
      
         [Parameter(
-            Mandatory=$True,
+            Mandatory=$true,
             ValueFromRemainingArguments=$true,
-            Position = 2
+            Position=2
         )]
         [AllowEmptyString()]
         [string[]]
@@ -159,6 +161,7 @@ function Refresh-PATH {
     Write-Host "Refresh-Env new PATH: $env:path"
 }
 
+
 function Refresh-pyenv_Env {
     # Reload PyEnv environment variable (except PATH) to get modifications from installer
     Write-Host "Refresh-Env old PYENV: $env:PYENV"
@@ -180,18 +183,19 @@ function Refresh-pyenv_Env {
     Write-Host "Refresh-Env new PYENV_HOME: $env:PYENV_HOME"    
 }
 
+
 function Download-File {
     param(
         [Parameter(
-            Mandatory=$True,
-            Position = 0
+            Mandatory=$true,
+            Position=0
         )]
         [string]
         $source_URL,
 
         [Parameter(
-            Mandatory=$True,
-            Position = 1
+            Mandatory=$true,
+            Position=1
         )]
         [string]
         $target_name
@@ -215,6 +219,7 @@ function Download-File {
     Log-Status 'Download DONE'
 }
 
+
 function Install-VSCode {
     $VSCode_installer = 'vscode_installer.exe'
     $VSCode_installer_path = Join-Path ${env:TEMP} -ChildPath $VSCode_installer
@@ -234,6 +239,7 @@ function Install-VSCode {
     Remove-Item $VSCode_installer_path
 }
 
+
 function Install-VSCode-Extension {
     param (
         [Parameter(
@@ -249,6 +255,7 @@ function Install-VSCode-Extension {
     }
 }
 
+
 function Install-pyenv-win {
     # Download and install
     $ProgressPreference = 'SilentlyContinue' # omit progress update to favour fast download time
@@ -257,6 +264,7 @@ function Install-pyenv-win {
     # Cleanup
     Remove-Item install-pyenv-win.ps1
 }
+
 
 function Check-pyenv-List {
     param (
@@ -283,6 +291,7 @@ function Check-pyenv-List {
     Write-Host "pyenv supports Python version $ver"
     return $true
 }
+
 
 function Lookup-pyenv-Cache {
 <#
@@ -388,8 +397,13 @@ Return value:
 #
 # Main
 #
-
-Set-ExecutionPolicy Bypass -Scope Process -Force
+Write-Header 'Step 0: Set install script execution policy'
+try {
+    Set-ExecutionPolicy Bypass -Scope Process -Force
+}
+catch {
+    Log-Err 'fatal' 'install script execution policy' $($_.Exception.Message)
+}
 
 #
 # VSCode

@@ -299,18 +299,19 @@ function Install-VSCode-Extension {
 
 function Install-pyenv-win {
     # Download and install
-    #$ProgressPreference = 'SilentlyContinue' # omit progress update to favour fast download time
-    #Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/pyenv-win/pyenv-win/master/pyenv-win/install-pyenv-win.ps1" -OutFile "./install-pyenv-win.ps1"; &"./install-pyenv-win.ps1"
+    $ProgressPreference = 'SilentlyContinue' # omit progress update to favour fast download time
+    Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/pyenv-win/pyenv-win/master/pyenv-win/install-pyenv-win.ps1" -OutFile "./install-pyenv-win.ps1"; &"./install-pyenv-win.ps1"
 
-    Log-Status 'Downloading pyenv-win'
-    $pyenv_win_URL = 'https://raw.githubusercontent.com/pyenv-win/pyenv-win/master/pyenv-win/install-pyenv-win.ps1'
-    $target_file = 'install-pyenv-win.ps1'
-    Download-File $pyenv_win_URL $target_file
+    # Log-Status 'Downloading pyenv-win'
+    # $pyenv_win_URL = 'https://raw.githubusercontent.com/pyenv-win/pyenv-win/master/pyenv-win/install-pyenv-win.ps1'
+    # $target_file = 'install-pyenv-win.ps1'
+    # Download-File $pyenv_win_URL $target_file
 
-    Log-Status 'Installing pyenv-win'
-    Invoke-Native "./${target_file}"
+    # Log-Status 'Installing pyenv-win'
+    # Invoke-Native "./${target_file}"
 
     # Cleanup
+    $target_file = 'install-pyenv-win.ps1'
     Remove-Item $target_file
 
     # Log-Status 'DONE'

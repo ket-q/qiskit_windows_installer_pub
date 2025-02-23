@@ -524,22 +524,22 @@ $DOT_VENVS_DIR = Join-Path ${env:USERPROFILE} -ChildPath '.virtualenvs'
 
 $MY_VENV_DIR = Join-Path ${DOT_VENVS_DIR} -ChildPath $qwi_vstr
 
-# try {
-#     if (Test-Path $MY_VENV_DIR) {
-#         # A venv of that name seems to exist already -> remove
-#         #rm -R $MY_VENV_DIR
-#         # Remove-Item -Force -Recurse -Path $MY_VENV_DIR
-#         Get-ChildItem $MY_VENV_DIR -Recurse | Remove-Item -Force -Recurse
-#     }
-# }
-# catch {
-#     $err_1 = $($_.Exception.Message)
-#     $err_0 = (
-#         "Unable to remove existing venv.",
-#         "Path/venv: $MY_VENV_DIR"
-#         ) -join "`r`n"
-#     Log-Err 'fatal' $err_0 $err_1
-# }
+try {
+    if (Test-Path $MY_VENV_DIR) {
+        # A venv of that name seems to exist already -> remove
+        #rm -R $MY_VENV_DIR
+        # Remove-Item -Force -Recurse -Path $MY_VENV_DIR
+        Get-ChildItem $MY_VENV_DIR -Recurse | Remove-Item -Force -Recurse
+    }
+}
+catch {
+    $err_1 = $($_.Exception.Message)
+    $err_0 = (
+        "Unable to remove existing venv.",
+        "Path/venv: $MY_VENV_DIR"
+        ) -join "`r`n"
+    Log-Err 'fatal' $err_0 $err_1
+}
 
 # Create and enter enclave folder $ROOT_DIR\$qwi_vstr. This is from where we
 # will set up the virtual environment in .virtualenvs

@@ -194,7 +194,7 @@ function Invoke-Native {
     
     Parameters:
     (1) command: the native command to run
-    (2) command arguments: possibly empty list of arguments
+    (2) command arguments: possibly empty list of arguments (usually strings)
 
     #>
 
@@ -204,11 +204,11 @@ function Invoke-Native {
 
     $cmd = $args[0]
 
-    $cmd_args = @()
+    $cmd_args = $null
     if ($args.Count -gt 1) {
         $cmd_args = $args[1..($args.Count-1)]
     }
-
+ 
     & $cmd $cmd_args
     $err = $LASTEXITCODE
 
@@ -441,7 +441,7 @@ Return value:
     Write-Host "Your pywin cache was not updated within the last 12 hours."
     Write-Host "Updating now, which may take some time..."
     try {
-        $discard = & pyenv update
+        $discard = Invoke-Native pyenv update
     }
     catch {
         Log-Err 'fatal' 'pyenv update' $($_.Exception.Message)
@@ -617,8 +617,8 @@ if ( !(Lookup-pyenv-Cache $python_version $ROOT_DIR) ) {
 
 Write-Header "Step 5: Set up Python $python_version for venv"
 try {
-    $err = & pyenv install $python_version
-    $err = & pyenv local $python_version
+    $err = Invoke-Native pyenv install $python_version
+    $err = Invoke-Native pyenv local $python_version
 }
 catch {
     Log-Err 'fatal' 'pyenv Python setup in enclave' $($_.Exception.Message)   
@@ -691,12 +691,12 @@ Download-File $req_URL ${requirements_file}
 Write-Header "Step 6: Set up venv $MY_VENV_DIR"
 try {
     # create venv
-    & pyenv exec python -m venv $MY_VENV_DIR
+    Invoke-Native pyenv exec python -m venv $MY_VENV_DIR
     # activate venv
-    & "${MY_VENV_DIR}\Scripts\activate.ps1"
+    Invoke-Native "${MY_VENV_DIR}\Scripts\activate.ps1"
 }
 catch {
-    Log-Err 'fatal' 'Setting up venv' $($_.Exception.Message) 1
+    Log-Err 'fatal' 'setting up venv' $($_.Exception.Message)
 }
 
 #
@@ -707,7 +707,7 @@ catch {
 # Update pip of venv
 Write-Header "Step 7: update pip of venv $MY_VENV_DIR"
 try {
-    & python -m pip install --upgrade pip
+    Invoke-Native python -m pip install --upgrade pip
 }
 catch {
     Log-Err 'fatal' 'Update pip of venv $MY_VENV_DIR' $($_.Exception.Message)
@@ -716,7 +716,7 @@ catch {
 # Install ipykernel module in venv
 Write-Header "Step 8: install ipykernel module in venv $MY_VENV_DIR"
 try {
-    & pip install ipykernel
+    Invoke-Native pip install ipykernel
 }
 catch {
     $err = $($_.Exception.Message)
@@ -729,7 +729,7 @@ catch {
 # Install Qiskit in venv
 Write-Header "Step 9: install Qiskit in venv $MY_VENV_DIR"
 try {   
-    & pip install -r $requirements_file
+    Invoke-Native pip install -r $requirements_file
 }
 catch {
     $err = $($_.Exception.Message)
@@ -746,7 +746,8 @@ try {
         "--user",
         "--name=$qwi_vstr",
         "--display-name", "`"$qwi_vstr`""
-    & python $args
+    # splat $args array (@args):
+    Invoke-Native python @args
 }
 catch {
     $err = $($_.Exception.Message)

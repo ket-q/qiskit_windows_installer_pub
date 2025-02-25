@@ -13,12 +13,76 @@ $qwi_vstr = 'qiskit_' + $qiskit_version.Replace('.', '_')
 #
 
 # Name and URL of the requirements.txt file to download from GitHub:
-#$requirements_file = 'requirements_qiskit_1_3_2.txt'
+# $requirements_file = 'requirements_qiskit_1_3_2.txt'
 $requirements_file = "symeng_requirements.txt"
 $req_URL = "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}"
 
 # Top-level folder of installer to keep files other than the venvs:
 $ROOT_DIR = Join-Path ${env:LOCALAPPDATA} -ChildPath 'qiskit_windows_installer'
+
+# Log file name and full path and name to the log:
+$LOG_DIR = Join-Path $ROOT_DIR -ChildPath 'log'
+$LOG_FILE = Join-Path $LOG_DIR -ChildPath 'log.txt'
+
+# Flag to keep track whether our log file is already in place and ready to
+# be used. Initially this flag is $false. It will be set to $true as soon
+# as the $LOG_FILE is known to exist.
+$log_up = $false
+
+
+function Output {
+<#
+.SYNOPSIS
+Take a string and write it to the target location(s).
+    
+Parameters:
+(1) $msg: the string to write out
+(2) $target: a string containing the target(s) to write to. Possible targets
+    include the console (via Write-Host), and the logfile $LOG.
+    
+    'c' .. write to console only
+    'f' .. write to logfile only
+    'cf .. write to both console and logfile (default)
+    'n' .. discard $msg (may be useful to supress logs without requiring an if
+           statement with the caller)
+
+    Note that the logfile only becomes accessible once our $ROOT_DIR folder
+    structure is set up. Until then, logs to the logfile are simply discarded.
+    (Depending on $log_up.)
+#>
+    param(
+        [Parameter(
+            Mandatory=$true,
+            Position=0
+        )]
+        [string]
+        $msg,
+
+        [Parameter(
+            Mandatory=$false,
+            Position=1
+        )]
+        [ValidateSet('c', 'f', 'cf', 'n')]
+        [string]
+        $target='cf'  # default value
+    )
+
+    # Write to console
+    if ( ($target -eq 'c') -or ($target -eq 'cf') ) {
+        Write-Host $msg
+    }
+
+    # Write to logfile
+    if ( ($target -eq 'f') -or ($target -eq 'cf') ) {
+        # Can only log if the logfile is in place
+        if ( $log_up ) {        
+            Add-content $LOG_FILE -value $msg
+        }
+        # else {
+        #    Write-Host "DISCARD $msg"
+        # }
+    }
+}
 
 
 function Write-Header {
@@ -27,9 +91,9 @@ function Write-Header {
         [string]$msg
     )
     $fill = "="*$msg.Length
-    Write-Host "====$fill===="
-    Write-Host "==  $msg  =="
-    Write-Host "====$fill===="
+    Output "====$fill===="
+    Output "==  $msg  =="
+    Output "====$fill===="
 }
 
 
@@ -563,7 +627,7 @@ Import the qiskit version number, and compare it to the expected version.
 #
 # Main
 #
-Write-Header 'Step 0: Set install script execution policy'
+Write-Header 'Step 1: Set install script execution policy'
 try {
     Set-ExecutionPolicy Bypass -Scope Process -Force
 }
@@ -571,21 +635,80 @@ catch {
     Log-Err 'fatal' 'install script execution policy' $($_.Exception.Message)
 }
 
-Write-Header 'Step 0a: Check installation platform'
+Write-Header 'Step 2: Check installation platform'
 Check-Installation-Platform
 
 #
-# Get EULA signatures from user
+# Set up installer root directory structure
 #
-# Here, right before we commit the first side-effect on the user's computer
-# is the proper place to get the EULAs signed.
+Write-Header 'Step 3: set up installer root folder structure'
+if (!(Test-Path $ROOT_DIR)){
+    New-Item -Path $ROOT_DIR -ItemType Directory
+}
 
-# TBD
+$qinst_root_obj = get-item $ROOT_DIR
+
+# Check that $ROOT_DIR is a folder and not a file. Required if
+# the name already pre-existed in the filesystem.
+if ( !($qinst_root_obj.PSIsContainer) ) {
+    $err_msg = (
+        "$ROOT_DIR is not a folder.",
+        "Please move $ROOT_DIR out of the way and re-run the script."
+        ) -join "`r`n"
+    Fatal-Error $err_msg 1
+}
+
+# Create log directory
+Write-Header 'Step 3a: set up log folder'
+try {
+    if ( !(Test-Path $LOG_DIR) ) {
+        # Log folder does not exist yet => create
+        $discard = New-Item -Path $LOG_DIR -ItemType Directory
+    }
+    if ( !(Test-Path $LOG_FILE) ) {
+        # Log file does not exist yet => create
+        New-Item $LOG_FILE -ItemType File
+    }
+    # Flag that logging is up-and-running
+    $discard = $log_up = $true
+}
+catch {
+    $err_msg = (
+        "Unable to set up $LOG_DIR.",
+        "Manual intervention required."
+        ) -join "`r`n"
+    Write-Host $err_msg  
+}
+
+# Create the enclave folder $ROOT_DIR\$qwi_vstr. This is from where we
+# set up the virtual environment.
+Write-Header 'Step 3b: set up enclave folder'
+try {
+    $ENCLAVE_DIR = Join-Path $ROOT_DIR -ChildPath $qwi_vstr
+    if (!(Test-Path $ENCLAVE_DIR)) {
+         $err = New-Item -Path $ENCLAVE_DIR -ItemType Directory
+    }
+    $err = Set-Location -Path $ENCLAVE_DIR
+}
+catch {
+    $err_msg = (
+        "Unable to cd into $ENCLAVE_DIR.",
+        "Manual intervention required."
+        ) -join "`r`n"
+    Fatal-Error $err_msg 1  
+}
+
+#
+# Get software license checked by user
+#
+
+Write-Header 'Step 4: check software licenses'
+Write-Host '(TBD)'
 
 #
 # VSCode
 #
-Write-Header 'Step 1: Install VSCode'
+Write-Header 'Step 5: Install VSCode'
 if ( !(Get-Command code -ErrorAction SilentlyContinue) ) {
     Log-Status 'VSCode not not installed, running installer'
     Install-VSCode
@@ -613,7 +736,7 @@ Install-VSCode-Extension 'ms-toolsai.jupyter'
 #
 # pyenv-win
 #
-Write-Header 'Step 2: Install pyenv-win'
+Write-Header 'Step 6: Install pyenv-win'
 if ( !(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
     Log-Status 'pyenv-win not installed, running installer'
     Install-pyenv-win
@@ -634,44 +757,6 @@ if ( !(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
 }
 
 #
-# Set up installer root dir and enclave folder
-#
-Write-Header 'Step 3: set up installer root folder'
-if (!(Test-Path $ROOT_DIR)){
-    New-Item -Path $ROOT_DIR -ItemType Directory
-}
-
-$qinst_root_obj = get-item $ROOT_DIR
-
-# Check that $ROOT_DIR is a folder and not a file. Required if
-# the name already pre-existed in the filesystem.
-if ( !($qinst_root_obj.PSIsContainer) ) {
-    $err_msg = (
-        "$ROOT_DIR is not a folder.",
-        "Please move $ROOT_DIR out of the way and re-run the script."
-        ) -join "`r`n"
-    Fatal-Error $err_msg 1
-} 
-
-# Create the enclave folder $ROOT_DIR\$qwi_vstr. This is from where we
-# set up the virtual environment.
-Write-Header 'Step 4: set up enclave folder'
-try {
-    $ENCLAVE_DIR = Join-Path $ROOT_DIR -ChildPath $qwi_vstr
-    if (!(Test-Path $ENCLAVE_DIR)) {
-         $err = New-Item -Path $ENCLAVE_DIR -ItemType Directory
-    }
-    $err = Set-Location -Path $ENCLAVE_DIR
-}
-catch {
-    $err_msg = (
-        "Unable to cd into $ENCLAVE_DIR.",
-        "Manual intervention required."
-        ) -join "`r`n"
-    Fatal-Error $err_msg 1  
-}
-
-#
 # We arrived in the enclave. Now
 # (0) Make sure that pyenv supported Python list is up-to-date
 # (1) Check that the Python version asked by the user exists in pyenv
@@ -680,7 +765,7 @@ catch {
 # (4) Use pipenv to create the ``official'' venv visible to the user in VSCode
 #
 
-Write-Header "Step 4a: Check if pyenv supports Python $python_version"
+Write-Header "Step 7: Check if pyenv supports Python $python_version"
 if ( !(Lookup-pyenv-Cache $python_version $ROOT_DIR) ) {
     $err_msg = (
         "Requested Python version $python_version not available with pyenv.",
@@ -690,7 +775,7 @@ if ( !(Lookup-pyenv-Cache $python_version $ROOT_DIR) ) {
     Log-Err 'fatal' "availability-check of Python $python_version" $err_msg    
 }
 
-Write-Header "Step 5: Set up Python $python_version for venv"
+Write-Header "Step 8: Set up Python $python_version for venv"
 try {
     $err = Invoke-Native pyenv install $python_version
     $err = Invoke-Native pyenv local $python_version
@@ -763,7 +848,7 @@ catch {
 Download-File $req_URL ${requirements_file}
 
 # Create venv
-Write-Header "Step 6: Set up venv $MY_VENV_DIR"
+Write-Header "Step 9: Set up venv $MY_VENV_DIR"
 try {
     # create venv
     Invoke-Native pyenv exec python -m venv $MY_VENV_DIR
@@ -780,7 +865,7 @@ catch {
 #
 
 # Update pip of venv
-Write-Header "Step 7: update pip of venv $MY_VENV_DIR"
+Write-Header "Step 10: update pip of venv $MY_VENV_DIR"
 try {
     Invoke-Native python -m pip install --upgrade pip
 }
@@ -789,7 +874,7 @@ catch {
 }
 
 # Install ipykernel module in venv
-Write-Header "Step 8: install ipykernel module in venv $MY_VENV_DIR"
+Write-Header "Step 11: install ipykernel module in venv $MY_VENV_DIR"
 try {
     Invoke-Native pip install ipykernel
 }
@@ -802,7 +887,7 @@ catch {
 }
 
 # Install Qiskit in venv
-Write-Header "Step 9: install Qiskit in venv $MY_VENV_DIR"
+Write-Header "Step 12: install Qiskit in venv $MY_VENV_DIR"
 try {   
     Invoke-Native pip install -r $requirements_file
 }
@@ -815,7 +900,7 @@ catch {
 }
 
 # Install Jupyter server in venv
-Write-Header "Step 10: install ipykernel kernel in venv $MY_VENV_DIR"
+Write-Header "Step 13: install ipykernel kernel in venv $MY_VENV_DIR"
 try {
     $args = "-m", "ipykernel", "install",
         "--user",
@@ -833,7 +918,7 @@ catch {
 }
 
 # Test the installation
-Write-Header "Step 11: testing the installation in $MY_VENV_DIR"
+Write-Header "Step 14: testing the installation in $MY_VENV_DIR"
 Test-symeng-Module
 # Test-qiskit-Version
 

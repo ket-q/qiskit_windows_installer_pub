@@ -127,15 +127,15 @@ Parameters:
 
 
 function Log-Status {
-    <#
-    .SYNOPSIS
-    Friendly, informative-character logging only (no error, no warnings).
-    Take a variable-length list of status variables and output them one by one.
+<#
+.SYNOPSIS
+Friendly, informative-character logging only (no error, no warnings).
+Take a variable-length list of status variables and output them one by one.
     
-    Parameters:
-    (1) statusVars: one or more status variables of type string to output
+Parameters:
+(1) statusVars: one or more status variables of type string to output
 
-    #>
+#>
     param(     
         [Parameter(
             Mandatory=$True,
@@ -150,6 +150,11 @@ function Log-Status {
     foreach ($statusVar in $statusVars) {
         Write-Host $statusVar
     }
+}
+
+
+function Check-Install-Platform {
+
 }
 
 
@@ -185,18 +190,18 @@ function Refresh-pyenv_Env {
 
 
 function Invoke-Native {
-    <#
-    .SYNOPSIS
-    PoSH v. 5 does not automatically check the exit code of native commands.
+<#
+.SYNOPSIS
+PoSH v. 5 does not automatically check the exit code of native commands.
 
-    Wrap passed native command to check its exit code and throw an exception
-    if non-zero.
+Wrap passed native command to check its exit code and throw an exception
+if non-zero.
     
-    Parameters:
-    (1) command: the native command to run
-    (2) command arguments: possibly empty list of arguments (usually strings)
+Parameters:
+(1) command: the native command to run
+(2) command arguments: possibly empty list of arguments (usually strings)
 
-    #>
+#>
 
     if ( $args.Count -eq 0) {
         throw 'Invoke-Native called without arguments'

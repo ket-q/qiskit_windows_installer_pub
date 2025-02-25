@@ -153,7 +153,58 @@ Parameters:
 }
 
 
-function Check-Install-Platform {
+function Check-Installation-Platform {
+<#
+.SYNOPSIS
+Check whether the computer we're running on complies with the requirements
+of this installer.
+.DESCRIPTION
+Conduct all possible up-front checks that ensure that the installation
+will be possible on this computer:
+
+1) platform is x86-64 (as our to-be-downloaded binary file names are
+   currently hard-coded to the ABI version)
+2) Windows version (v. 10 and 11 currently supported)
+3) sufficient disk space (min 4GB of free space).
+   FIXME: Because the space requirement will
+   vary across Qiskit versions, a better space estimation method will
+   be required in the future. Perhaps provide the required space in the
+   requirements.txt file?
+#>
+    # CPU architecture
+    $arch = $env:PROCESSOR_ARCHITECTURE
+    if ( $arch -ne 'AMD64' ) {
+        $err_msg = (
+            "The installer currently only supports the 'AMD64' architecture",
+            "But this computer is of architecture '$arch'."
+            ) -join "`r`n"
+        Log-Err 'fatal' 'Check-Install-Platform' $err_msg
+    }
+
+    # Windows version
+    $ver_prop = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion"
+    $win_ver = (Get-ItemProperty $ver_prop).CurrentMajorVersionNumber
+    if ( ($win_ver -ne 10) -and ($win_ver -ne 11) ) {
+        $err_msg = (
+            "The installer currently only supports Windows 10 and 11.",
+            "But this computer is running Windows version $win_ver."
+            ) -join "`r`n"
+        Log-Err 'fatal' 'Check-Install-Platform' $err_msg       
+    }
+
+    # Free disk space
+    $req_space = 4GB
+    $free_space = (Get-PSDrive 'C').Free
+    if ( $free_space -lt $req_space ) {
+        $req_rnd = [math]::Round($req_space/1GB, 1)
+        $free_rnd = [math]::Round($free_space/1GB, 1)
+        $err_msg = (
+            "The installer requires a minimum of ${req_rnd} GB of free disk space",
+            "on the C drive. But the C drive currently has only ${free_rnd} GB ",
+            "available. Please make space on the C drive, and try again."
+            ) -join "`r`n"
+        Write-Host $err_msg   
+    }
 
 }
 
@@ -510,6 +561,9 @@ try {
 catch {
     Log-Err 'fatal' 'install script execution policy' $($_.Exception.Message)
 }
+
+Write-Header 'Step 0a: Check installation platform'
+Check-Installation-Platform
 
 #
 # VSCode

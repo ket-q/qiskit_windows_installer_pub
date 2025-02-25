@@ -108,10 +108,10 @@ function Fatal-Error {
     $first = $true
     ForEach ($line in $($err_msg -split "\r?\n|\r")) {
         if ($first) {
-            Write-Host "ERROR: $line"
+            Output "ERROR: $line"
             $first = $false
         } else {
-            Write-Host "       $line"
+            Output "       $line"
         }
     }
     Exit $err_val
@@ -172,25 +172,25 @@ Parameters:
     # and return.
     if (!$have_error) {
         $msg = "|STATUS| ${secondArg}: DONE"
-        Write-Host $msg
+        Output $msg
         return
     }
 
     # Falling through here means at least one error variable was non-empty,
     # and we log the details.
     $sep = "-"*79
-    Write-Host $sep
+    Output $sep
     $kind = $(If ($firstArg -eq 'fatal') {"ERROR"} Else {"WARNING"})
     $ending = $(If ($var_count -gt 1) {"s"} Else {""})
-    Write-Host "${kind}${ending} from ${secondArg}:"
+    Output "${kind}${ending} from ${secondArg}:"
     $count = 0
     foreach ($listArg in $listArgs) {
-        Write-Host $sep
+        Output $sep
         $err_str = $(If ($listArg) {$listArg} Else {"OK"})
-        Write-Host $('Err[{0}]: {1}' -f $count, $err_str)
+        Output $('Err[{0}]: {1}' -f $count, $err_str)
         $count++
     }
-    Write-Host $sep
+    Output $sep
 
     if (($firstArg -eq 'fatal') -and $have_error) {
         # Terminate the script
@@ -221,7 +221,7 @@ Parameters:
     )
     
     foreach ($statusVar in $statusVars) {
-        Write-Host $statusVar
+        Output $statusVar
     }
 }
 
@@ -276,29 +276,28 @@ will be possible on this computer:
             "on the C drive. But the C drive currently has only ${free_rnd} GB ",
             "available. Please make space on the C drive, and try again."
             ) -join "`r`n"
-        Write-Host $err_msg   
+        Log-Err $err_msg   
     }
-
 }
 
 
 function Refresh-PATH {
     # Reload PATH environment variable to get modifications from program installers
-    Write-Host "Refresh-Env old PATH: $env:Path"
+    Output "Refresh-Env old PATH: $env:Path"
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") +
               ";" +
               [System.Environment]::GetEnvironmentVariable("Path","User")
-    Write-Host "Refresh-Env new PATH: $env:Path"
+    Output "Refresh-Env new PATH: $env:Path"
 }
 
 
 function Refresh-pyenv_Env {
     # Reload PyEnv environment variable (except PATH) to get modifications from installer
-    Write-Host "Refresh-Env old PYENV: $env:PYENV"
+    Output "Refresh-Env old PYENV: $env:PYENV"
     $env:PYENV = [System.Environment]::GetEnvironmentVariable("PYENV","Machine") +
                ";" +
                [System.Environment]::GetEnvironmentVariable("PYENV","User")
-    Write-Host "Refresh-Env new PYENV: $env:PYENV"
+    Output "Refresh-Env new PYENV: $env:PYENV"
 
     #
     # PYENV_ROOT and PYENV_HOME seem to be unpopulated from pyenv-win installer
@@ -390,8 +389,6 @@ function Install-VSCode {
     # Download the local installer by appending '-user' to the download URL:
     $VSCode_URL = 'https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user'
 
-    Write-Host $VSCode_installer_path
-
     # Download VSCode
     Log-Status 'Downloading VSCode installer'
     Download-File $VSCode_URL $VSCode_installer_path
@@ -475,10 +472,10 @@ function Check-pyenv-List {
     $version_pattern = [regex]::Escape($ver)
     # \b means we only match on word boundaries.
     if ( !($versions -match "\b${version_pattern}\b") ) {
-        Write-Host "pyenv does not list Python version '$ver'"
+        Log-Status "pyenv does not list Python version '$ver'"
         return $false
     }
-    Write-Host "pyenv supports Python version $ver"
+    Log-Status "pyenv supports Python version $ver"
     return $true
 }
 
@@ -561,14 +558,14 @@ Return value:
     if ( !$need_refresh ) {
         # A cache update was not necessary. Thus
         # there's no point in another lookup and we give up.
-        Write-Host "pywin cache already updated within the last 12 hours."
-        Write-Host "No further update was attempted."
+        Log-Status "pywin cache already updated within the last 12 hours."
+        Log-Status "No further update was attempted."
         return $false
     }
 
     # If we fall through here, the cache update and re-lookup is required
-    Write-Host "Your pywin cache was not updated within the last 12 hours."
-    Write-Host "Updating now, which may take some time..."
+    Log-Status "Your pywin cache was not updated within the last 12 hours."
+    Log-Status "Updating now, which may take some time..."
     try {
         $discard = Invoke-Native pyenv update
     }
@@ -677,7 +674,7 @@ catch {
         "Unable to set up $LOG_DIR.",
         "Manual intervention required."
         ) -join "`r`n"
-    Write-Host $err_msg  
+    Log-Err 'fatal' 'setup of log folder' $err_msg  
 }
 
 # Create the enclave folder $ROOT_DIR\$qwi_vstr. This is from where we

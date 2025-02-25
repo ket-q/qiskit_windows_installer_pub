@@ -7,10 +7,19 @@ $qiskit_version = '1.3.2'
 
 # Name of venv in .virtualenvs
 $qwi_vstr = 'qiskit_' + $qiskit_version.Replace('.', '_')
+
+#
+# Folders and files
+#
+
 # Name and URL of the requirements.txt file to download from GitHub:
 #$requirements_file = 'requirements_qiskit_1_3_2.txt'
 $requirements_file = "symeng_requirements.txt"
 $req_URL = "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}"
+
+# Top-level folder of installer to keep files other than the venvs:
+$ROOT_DIR = Join-Path ${env:LOCALAPPDATA} -ChildPath 'qiskit_windows_installer'
+
 
 function Write-Header {
     param(
@@ -566,6 +575,14 @@ Write-Header 'Step 0a: Check installation platform'
 Check-Installation-Platform
 
 #
+# Get EULA signatures from user
+#
+# Here, right before we commit the first side-effect on the user's computer
+# is the proper place to get the EULAs signed.
+
+# TBD
+
+#
 # VSCode
 #
 Write-Header 'Step 1: Install VSCode'
@@ -620,7 +637,6 @@ if ( !(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
 # Set up installer root dir and enclave folder
 #
 Write-Header 'Step 3: set up installer root folder'
-$ROOT_DIR = Join-Path ${env:LOCALAPPDATA} -ChildPath 'qiskit_windows_installer'
 if (!(Test-Path $ROOT_DIR)){
     New-Item -Path $ROOT_DIR -ItemType Directory
 }

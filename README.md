@@ -15,16 +15,13 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 Add-Type -AssemblyName presentationframework 
 ```
 
-4. You can now execute the script: ```powershell 
+4. You can now execute the script:
+```powershell 
 .\qiskit_installer.ps1 
 ```
 
 
-
-
-To proceed with the installation, please click on the following link, which will download the installation script on your local computer, and prompt you to run with Administrator privileges (which it requires to perform its tasks). Clicking `yes` in this diaglog will start the installation.
-
- 
+## Used tools 
 
 
 ### Pipenv

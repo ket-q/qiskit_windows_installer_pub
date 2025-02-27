@@ -5,9 +5,9 @@ Before you begin, please read the Legal section (TBD).
 
 
 
-1. First, download qiskit_installer.ps1
+1. First, download [qiskit_installer.ps1](https://github.com/ket-q/qiskit_windows_installer/blob/axel/qiskit_installer.ps1)
 
-2. Open a powershell bash and navigate the download location
+2. Open a powershell bash and navigate to the download location
 
 3. Execute the following commands: 
 ```powershell
@@ -15,16 +15,13 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 Add-Type -AssemblyName presentationframework 
 ```
 
-4. You can now execute the script: ```powershell 
+4. You can now execute the script:
+```powershell 
 .\qiskit_installer.ps1 
 ```
 
 
-
-
-To proceed with the installation, please click on the following link, which will download the installation script on your local computer, and prompt you to run with Administrator privileges (which it requires to perform its tasks). Clicking `yes` in this diaglog will start the installation.
-
- 
+## Used tools 
 
 
 ### Pipenv

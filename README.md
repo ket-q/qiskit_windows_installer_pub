@@ -5,9 +5,9 @@ Before you begin, please read the Legal section (TBD).
 
 
 
-1. First, download qiskit_installer.ps1
+1. First, download [qiskit_installer.ps1](https://github.com/ket-q/qiskit_windows_installer/blob/axel/qiskit_installer.ps1)
 
-2. Open a powershell bash and navigate the download location
+2. Open a powershell bash and navigate to the download location
 
 3. Execute the following commands: 
 ```powershell

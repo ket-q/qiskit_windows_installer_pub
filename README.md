@@ -1,32 +1,28 @@
-# qiskit_windows_installer
+# qiskit_windows_installer AXEL BRANCH
 Installer for Qiskit on Microsoft Windows platforms.
 ## Installation
 Before you begin, please read the Legal section (TBD).
+
+
+
+1. First, download qiskit_installer.ps1
+
+2. Open a powershell bash and navigate the download location
+
+3. Execute the following commands: 
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+Add-Type -AssemblyName presentationframework
+
+4. You can now execute the script: .\qiskit_installer.ps1
+
+
+
 
 To proceed with the installation, please click on the following link, which will download the installation script on your local computer, and prompt you to run with Administrator privileges (which it requires to perform its tasks). Clicking `yes` in this diaglog will start the installation.
 
  
 
-[Qiskit Windows Installer script](http://boxstarter.org/package/url?https://raw.githubusercontent.com/ket-q/qiskit_windows_installer/main/box_install.ps1)
 
-**Note:** for this to work you need a browser with ClickOnce support, such as Microsoft Edge or Internet Explorer.
-
-## Appendices
-### Chocolatey
-* Installation of Chocolatey as part of the overall install script ([link](https://haricodes.com/chocolatey-windows-setup)).
-* Installation of Python ([link](https://python-docs.readthedocs.io/en/latest/starting/install3/win.html)).
-****
-Chololatey installs its programs below its own installation folder in `C:\ProgramData\chocolatey\lib` (see [link](https://stackoverflow.com/questions/36429322/what-directory-does-chocolatey-install-commands-to)).
-* Chech whether a given package is installed in Chocolatey, e.g., Python:
-```bash
-choco list --exact python --trace
-```
-#### Boxstarter
-The Boxstarter founder has a blog with related entries ([link1](https://www.hurryupandwait.io/blog/setup-a-new-machine-with-just-a-url-and-chocolatey-package), [link2](https://www.hurryupandwait.io/search?q=boxstarter&f_collectionId=53f3208ce4b02368bad86b71)).
-Boxstarter is a part of Chocolatey. Running a Boxstarter script from the command-line (notice `-DisableReboots`):
-```bash
-Install-BoxstarterPackage -PackageName .\win_update.ps1 -DisableReboots
-```
 ### Pipenv
 [Pipenv](https://pipenv.pypa.io/en/latest/) is a tool to manage Python virtual environments and their software packages, and to facilitate packaging of packages present in a virtual environment.
 It is capable of `dependency resolution`, which makes sure that all package dependencies are met. An introductions to Pipenv is from RealPython ([link](https://realpython.com/pipenv-guide/)), more advanced usage is described on the Pipenv website ([link](https://docs.pipenv.org/advanced/#configuration-with-environment-variables)).

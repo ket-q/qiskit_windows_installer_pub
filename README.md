@@ -19,6 +19,18 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\qiskit_installer.ps1 
 ```
 
+## Usage
+
+### This insaller creates a private environnement with Qiskit to avoid any conflicts.
+
+To use this properly, you need to select the correct interpreter when running your script. 
+
+With VS Code:
+1. Open the command palette (Ctrl + Shift + P)
+2. Select "Python : select interpreter"
+3. Select "Python 3.* (Qiskit 1.*)"
+
+You can now run Qiskit on windows.
 
 ## Used tools 
 

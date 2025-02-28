@@ -12,7 +12,6 @@ Before you begin, please read the Legal section (TBD).
 3. Execute the following commands: 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-Add-Type -AssemblyName presentationframework 
 ```
 
 4. You can now execute the script:
@@ -20,6 +19,18 @@ Add-Type -AssemblyName presentationframework
 .\qiskit_installer.ps1 
 ```
 
+## Usage
+
+### This insaller creates a private environnement with Qiskit to avoid any conflicts.
+
+To use this properly, you need to select the correct interpreter when running your script. 
+
+With VS Code:
+1. Open the command palette (Ctrl + Shift + P)
+2. Select "Python : select interpreter"
+3. Select "Python 3.* (Qiskit 1.*)"
+
+You can now run Qiskit on windows.
 
 ## Used tools 
 

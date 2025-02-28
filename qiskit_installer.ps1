@@ -13,8 +13,8 @@ $qwi_vstr = 'qiskit_' + $qiskit_version.Replace('.', '_')
 #
 
 # Name and URL of the requirements.txt file to download from GitHub:
-$requirements_file = 'requirements_qiskit_1_3_2.txt'
-#$requirements_file = "symeng_requirements.txt"
+# $requirements_file = 'requirements_qiskit_1_3_2.txt'
+$requirements_file = "symeng_requirements.txt"
 $req_URL = "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}"
 
 # Top-level folder of installer to keep files other than the venvs:
@@ -1136,18 +1136,6 @@ try {
 catch {
     Log-Err 'fatal' $($_.Exception.Message)
 }
-
-Write-Header "Step 15: Open Visual Studio code with the notebook"
-try {
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/donnemartin/data-science-ipython-notebooks/refs/heads/master/python-data/structs.ipynb" -OutFile "$MY_VENV_DIR\notebook.ipynb"
-code "$MY_VENV_DIR\notebook.ipynb"
-}
-catch {
-    Log-Err 'fatal' $($_.Exception.Message)
-}
-
-Log-Status "INSTALLATION DONE"
-
 
 # Done
 Exit 0

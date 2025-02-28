@@ -12,7 +12,6 @@ Before you begin, please read the Legal section (TBD).
 3. Execute the following commands: 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-Add-Type -AssemblyName presentationframework 
 ```
 
 4. You can now execute the script:

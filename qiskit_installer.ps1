@@ -1103,7 +1103,7 @@ catch {
 
 Write-Header "Step 15: Open Visual Studio code with the notebook"
 try {
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/donnemartin/data-science-ipython-notebooks/refs/heads/master/python-data/structs.ipynb" -OutFile "$MY_VENV_DIR\notebook.ipynb"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ket-q/qiskit_windows_installer_pub/refs/heads/main/notebooks/IBM_account_setup.ipynb" -OutFile "$MY_VENV_DIR\notebook.ipynb"
 code "$MY_VENV_DIR\notebook.ipynb"
 }
 catch {

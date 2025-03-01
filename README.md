@@ -1,23 +1,11 @@
-# qiskit_windows_installer AXEL BRANCH
+# qiskit_windows_installer 
 Installer for Qiskit on Microsoft Windows platforms.
 ## Installation
 Before you begin, please read the Legal section (TBD).
 
 
+**Download and execute our [Qiskit Windows Installer](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)**
 
-1. First, download [qiskit_installer.ps1](https://github.com/ket-q/qiskit_windows_installer/blob/axel/qiskit_installer.ps1)
-
-2. Open a powershell bash and navigate to the download location
-
-3. Execute the following commands: 
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-```
-
-4. You can now execute the script:
-```powershell 
-.\qiskit_installer.ps1 
-```
 
 ## Usage
 

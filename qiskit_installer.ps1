@@ -2,6 +2,7 @@
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 
+
 $python_version = '3.12.9' # 3.13 not working because ray requires Python 3.12
 $qiskit_version = '1.3.2'
 
@@ -13,8 +14,8 @@ $qwi_vstr = 'qiskit_' + $qiskit_version.Replace('.', '_')
 #
 
 # Name and URL of the requirements.txt file to download from GitHub:
-# $requirements_file = 'requirements_qiskit_1_3_2.txt'
-$requirements_file = "symeng_requirements.txt"
+$requirements_file = 'requirements_qiskit_1_3_2.txt'
+#$requirements_file = "symeng_requirements.txt"
 $req_URL = "https://raw.githubusercontent.com/ket-q/launchpad/refs/heads/main/config/${requirements_file}"
 
 # Top-level folder of installer to keep files other than the venvs:
@@ -623,182 +624,147 @@ Import the qiskit version number, and compare it to the expected version.
 
 
 function Licence_window{
-    # Window creation
-    
+    Add-Type -AssemblyName PresentationFramework
 
+$window = New-Object System.Windows.Window
+$window.Title = "Qiskit Windows Installer"
+$window.Width = 800
+$window.Height = 600
 
-    $window = New-Object System.Windows.Window
-    $window.Title = "Qiskit Windows Installer"
-    $window.Width = 800
-    $window.Height = 600
+# Textblock of the notice
+$textBlock = New-Object System.Windows.Controls.TextBlock
+$textBlock.Text = "The Qiskit windows installer will install the following software packages on your computer and you are required to agree with their license agreements to proceed."
+$textBlock.TextWrapping = [System.Windows.TextWrapping]::Wrap
+$textBlock.Margin = [System.Windows.Thickness]::new(10)
+$textBlock.FontSize = 25
 
-    # Textblock of the notice
+# Function to create a checkbox with a hyperlink
+function Create-CheckboxWithLink {
+    param (
+        [string]$checkBoxContent,
+        [string]$linkText,
+        [string]$url
+    )
+
+    # Create checkbox
+    $checkBox = New-Object System.Windows.Controls.CheckBox
+    $checkBox.Margin = [System.Windows.Thickness]::new(10)
+    $checkBox.Width = 500
+    $checkBox.Height = 40  
+    $checkBox.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Left
+
+    # Create text block and set content
     $textBlock = New-Object System.Windows.Controls.TextBlock
-    $textBlock.Text = "The Qiskit windows installer will install the following software packages on your computer and you are required to agree with their license agreements to proceed."
-    $textBlock.TextWrapping = [System.Windows.TextWrapping]::Wrap
-    $textBlock.Margin = [System.Windows.Thickness]::new(10)
-    $textBlock.FontSize = 30 
+    $textBlock.Margin = [System.Windows.Thickness]::new(0)
+    $textBlock.Inlines.Add($checkBoxContent)
+    $textBlock.FontSize = 20  
 
-    # Checkbox class
-    class CheckboxWithLink {
-        [System.Windows.Controls.CheckBox]$CheckBox
-        [System.Windows.Documents.Hyperlink]$Hyperlink
-        [string]$Url
+    # Create hyperlink
+    $hyperlink = New-Object System.Windows.Documents.Hyperlink
+    $hyperlink.Inlines.Add($linkText)
+    $textBlock.Inlines.Add($hyperlink)
 
-        # Constructor to initialize checkbox, hyperlink, and URL
-        CheckboxWithLink([string]$checkBoxContent, [string]$linkText, [string]$url) {
-            # Create checkbox
-            $this.CheckBox = New-Object System.Windows.Controls.CheckBox
-            $this.CheckBox.Margin = [System.Windows.Thickness]::new(10)
+    $checkBox.Content = $textBlock
 
-            $this.CheckBox.Width = 500 
-            $this.CheckBox.Height = 40  
-            $this.CheckBox.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Left
-
-    
-
-            # Create text block and set content
-            $textBlock = New-Object System.Windows.Controls.TextBlock
-            $textBlock.Margin = [System.Windows.Thickness]::new(0)
-            $textBlock.Inlines.Add($checkBoxContent)
-
-            $textBlock.FontSize = 20  
-
-
-            $this.Hyperlink = New-Object System.Windows.Documents.Hyperlink
-            $this.Hyperlink.Inlines.Add($linkText)
-
-            $textBlock.Inlines.Add($this.Hyperlink)
-
-            $this.CheckBox.Content = $textBlock
-
-            # Store the URL for later use
-            $this.Url = $url
-            # Store a reference to the parent CheckboxWithLink in the Hyperlink object
-            $this.Hyperlink.Tag = $this  # Use the Tag property to store the parent object
-        }
-
-
-        # Method to attach the Click event to the hyperlink
-        [void]AddClickEvent() {
-            # Attach the click event to the hyperlink
-            $this.Hyperlink.Add_Click({
-                # Get the parent CheckboxWithLink object from the Hyperlink's Tag property
-                $parent = $this.Tag  # Retrieve the parent CheckboxWithLink object
-                Start-Process $parent.Url  # Start the process with the URL
-            })
-        }
-    }
-
-
-    # Create Checkboxes with Links
-    $checkBoxVSCode = [CheckboxWithLink]::new("VSCode", "(VSCode EULA)", "https://code.visualstudio.com/license")
-    $checkBoxPython = [CheckboxWithLink]::new("Python", "(Python License Agreement)", "https://docs.python.org/3/license.html")
-    $checkBoxQiskit = [CheckboxWithLink]::new("Qiskit", "(Qiskit License Agreement)", "https://quantum.ibm.com/terms")
-    $checkBoxPyenv = [CheckboxWithLink]::new("Pyenv-win", "(Pyenv License Agreement)", "https://github.com/pyenv-win/pyenv-win/blob/master/LICENSE")
-    $checkBoxInstaller = [CheckboxWithLink]::new("Qiskit Windows Installer", "(Installer License Agreement)", "https://github.com/ket-q/qiskit_windows_installer/blob/main/LICENSE")
-
-
-
-
-    # Add Click event to each checkbox hyperlink
-    $checkBoxVSCode.AddClickEvent()
-    $checkBoxPython.AddClickEvent()
-    $checkBoxQiskit.AddClickEvent()
-    $checkBoxPyenv.AddClickEvent()
-    $checkBoxInstaller.AddClickEvent()
-
-    # Create a Button (Proceed)
-    $buttonProceed = New-Object System.Windows.Controls.Button
-    $buttonProceed.Content = "Accept"
-    $buttonProceed.Width = 100
-    $buttonProceed.Height = 30
-    $buttonProceed.IsEnabled = $false  # Start with button disabled
-
-    # Create a Button (Cancel)
-    $buttonCancel = New-Object System.Windows.Controls.Button
-    $buttonCancel.Content = "Cancel"
-    $buttonCancel.Width = 100
-    $buttonCancel.Height = 30
-
-
-    # Define the event handler for checkbox changes
-    $checkBoxChangedHandler = {
-        # Enable the Proceed button only when all checkboxes are checked
-        if ($checkBoxVSCode.CheckBox.IsChecked -and $checkBoxPython.CheckBox.IsChecked -and $checkBoxQiskit.CheckBox.IsChecked -and $checkBoxPyenv.CheckBox.IsChecked -and $checkBoxInstaller.CheckBox.IsChecked) {
-            $buttonProceed.IsEnabled = $true
-        } else {
-            $buttonProceed.IsEnabled = $false
-        }
-
-    
-    }
-
-    # Add the event handler to each checkbox
-    $checkBoxVSCode.CheckBox.Add_Checked($checkBoxChangedHandler)
-    $checkBoxPython.CheckBox.Add_Checked($checkBoxChangedHandler)
-    $checkBoxQiskit.CheckBox.Add_Checked($checkBoxChangedHandler)
-    $checkBoxPyenv.CheckBox.Add_Checked($checkBoxChangedHandler)
-    $checkBoxInstaller.CheckBox.Add_Checked($checkBoxChangedHandler)
-
-    $checkBoxVSCode.CheckBox.Add_Unchecked($checkBoxChangedHandler)
-    $checkBoxPython.CheckBox.Add_Unchecked($checkBoxChangedHandler)
-    $checkBoxQiskit.CheckBox.Add_Unchecked($checkBoxChangedHandler)
-    $checkBoxPyenv.CheckBox.Add_Unchecked($checkBoxChangedHandler)
-    $checkBoxInstaller.CheckBox.Add_Unchecked($checkBoxChangedHandler)
-
-
-
-    # Create a StackPanel to organize the layout
-    #Adding null assignement to prevent outputting number in the console
-
-    $stackPanel = New-Object System.Windows.Controls.StackPanel
-    $null = $stackPanel.Children.Add($textBlock)  
-    $null = $stackPanel.Children.Add($checkBoxVSCode.CheckBox)
-    $null = $stackPanel.Children.Add($checkBoxPython.CheckBox)
-    $null = $stackPanel.Children.Add($checkBoxQiskit.CheckBox)
-    $null = $stackPanel.Children.Add($checkBoxPyenv.CheckBox)
-    $null = $stackPanel.Children.Add($checkBoxInstaller.CheckBox)
-    $null = $stackPanel.Children.Add($buttonProceed)
-    $null = $stackPanel.Children.Add($buttonCancel)
-
-    # Set the StackPanel as the window's content
-    $window.Content = $stackPanel
-
-
-    # Variable to track if the user accepted the license
-    $global:acceptedLicense = $false
-
-    # Define the event handler for "Proceed" button click
-    $buttonProceed.Add_Click({
-        # Set the acceptedLicense to true as the user is proceeding
-        $global:acceptedLicense = $true
-
-        # Close the window
-        $window.Close()
+    # Define the event for hyperlink click
+    $hyperlink.Add_Click({
+        Start-Process $url    #THIS DOESN'T WORK AS WE LOSE THE INFORMATION SOMEHOW AFTER THE INITIALIZTION
     })
 
-    $buttonCancel.Add_Click({
-        # Set the acceptedLicense to false as the user canceled
-        $global:acceptedLicense = $false
-        # Close the window
-        $window.Close()
-    })
+    return $checkBox
+}
 
+# Create Checkboxes with Links using the function
+$checkBoxVSCode = Create-CheckboxWithLink "VSCode" "(VSCode EULA)" "https://code.visualstudio.com/license"
+$checkBoxPython = Create-CheckboxWithLink "Python" "(Python License Agreement)" "https://docs.python.org/3/license.html"
+$checkBoxQiskit = Create-CheckboxWithLink "Qiskit" "(Qiskit License Agreement)" "https://quantum.ibm.com/terms"
+$checkBoxPyenv = Create-CheckboxWithLink "Pyenv-win" "(Pyenv License Agreement)" "https://github.com/pyenv-win/pyenv-win/blob/master/LICENSE"
+$checkBoxInstaller = Create-CheckboxWithLink "Qiskit Windows Installer" "(Installer License Agreement)" "https://github.com/ket-q/qiskit_windows_installer/blob/main/LICENSE"
 
-    # Show the Window (this will block the code execution until the window is closed)
-    $null = $window.ShowDialog()
+# Create a Button (Proceed)
+$buttonProceed = New-Object System.Windows.Controls.Button
+$buttonProceed.Content = "Accept"
+$buttonProceed.Width = 150
+$buttonProceed.Height = 50
+$buttonProceed.FontSize = 25
+$buttonProceed.IsEnabled = $false  # Start with button disabled
 
-    # After the window is closed, check the value of $acceptedLicense
-    if ($global:acceptedLicense) {
-        Write-Host "User accepted the license agreements."
-        return $true
-        #The installer should continue normally there
+# Create a Button (Cancel)
+$buttonCancel = New-Object System.Windows.Controls.Button
+$buttonCancel.Content = "Cancel"
+$buttonCancel.Width = 150
+$buttonCancel.Height = 50
+$buttonCancel.FontSize = 25
+
+# Define the event handler for checkbox changes
+$checkBoxChangedHandler = {
+    # Enable the Proceed button only when all checkboxes are checked
+    if ($checkBoxVSCode.IsChecked -and $checkBoxPython.IsChecked -and $checkBoxQiskit.IsChecked -and $checkBoxPyenv.IsChecked -and $checkBoxInstaller.IsChecked) {
+        $buttonProceed.IsEnabled = $true
     } else {
-        Write-Host "User cancelled or closed the window."
-        #Stop the installer
-        return $false
+        $buttonProceed.IsEnabled = $false
     }
+}
+
+# Add the event handler to each checkbox
+$checkBoxVSCode.Add_Checked($checkBoxChangedHandler)
+$checkBoxPython.Add_Checked($checkBoxChangedHandler)
+$checkBoxQiskit.Add_Checked($checkBoxChangedHandler)
+$checkBoxPyenv.Add_Checked($checkBoxChangedHandler)
+$checkBoxInstaller.Add_Checked($checkBoxChangedHandler)
+
+$checkBoxVSCode.Add_Unchecked($checkBoxChangedHandler)
+$checkBoxPython.Add_Unchecked($checkBoxChangedHandler)
+$checkBoxQiskit.Add_Unchecked($checkBoxChangedHandler)
+$checkBoxPyenv.Add_Unchecked($checkBoxChangedHandler)
+$checkBoxInstaller.Add_Unchecked($checkBoxChangedHandler)
+
+# Create a StackPanel to organize the layout
+$stackPanel = New-Object System.Windows.Controls.StackPanel
+$null = $stackPanel.Children.Add($textBlock)
+$null = $stackPanel.Children.Add($checkBoxVSCode)
+$null = $stackPanel.Children.Add($checkBoxPython)
+$null = $stackPanel.Children.Add($checkBoxQiskit)
+$null = $stackPanel.Children.Add($checkBoxPyenv)
+$null = $stackPanel.Children.Add($checkBoxInstaller)
+$null = $stackPanel.Children.Add($buttonProceed)
+$null = $stackPanel.Children.Add($buttonCancel)
+
+# Set the StackPanel as the window's content
+$window.Content = $stackPanel
+
+# Variable to track if the user accepted the license
+$global:acceptedLicense = $false
+
+# Define the event handler for "Proceed" button click
+$buttonProceed.Add_Click({
+    # Set the acceptedLicense to true as the user is proceeding
+    $global:acceptedLicense = $true
+
+    # Close the window
+    $window.Close()
+})
+
+$buttonCancel.Add_Click({
+    # Set the acceptedLicense to false as the user canceled
+    $global:acceptedLicense = $false
+    # Close the window
+    $window.Close()
+})
+
+# Show the Window (this will block the code execution until the window is closed)
+$null = $window.ShowDialog()
+
+# After the window is closed, check the value of $acceptedLicense
+if ($global:acceptedLicense) {
+    Write-Host "User accepted the license agreements."
+    return $true
+    # The installer should continue normally there
+} else {
+    Write-Host "User cancelled or closed the window."
+    # Stop the installer
+    return $false
+}
 
 }
 
@@ -885,10 +851,8 @@ catch {
 
 Write-Header 'Step 4: check software licenses'
 
+
 try {
-
-    Add-Type -AssemblyName presentationframework
-
 
     $result = Licence_window
 
@@ -1136,6 +1100,18 @@ try {
 catch {
     Log-Err 'fatal' $($_.Exception.Message)
 }
+
+Write-Header "Step 15: Open Visual Studio code with the notebook"
+try {
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/donnemartin/data-science-ipython-notebooks/refs/heads/master/python-data/structs.ipynb" -OutFile "$MY_VENV_DIR\notebook.ipynb"
+code "$MY_VENV_DIR\notebook.ipynb"
+}
+catch {
+    Log-Err 'fatal' $($_.Exception.Message)
+}
+
+Log-Status "INSTALLATION DONE"
+
 
 # Done
 Exit 0

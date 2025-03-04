@@ -26,32 +26,33 @@ This installer will set up Qiskit and a local copy of VSCode on your computer, w
 
 ## 💥 QuickStart / Installation 
 
-### Step 1 (first method) Download and execute the qiskit_installer.exe :
 
-**An exe file is generated for you, but the script is availabe if you want to check it before running it**
+
+### Step 1 (FIRST METHOD) Download and execute the [qiskit_installer.exe](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)
+*An executable file is generated for you, but the script is availabe if you want to check it before running it*
 
 Download and execute our [Qiskit Windows Installer](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)
 
-   
-### Step 1. (second method) Run script with powershell:
+  
+### Step 1 (SECOND METHOD) Run script with powershell:
 
-#### Step 1.1 Download the script qiskit_installer.ps1
-
-#### Step 1.2 Open a powershell console and navigate to the qiksit_installer.ps1 download file
-
-
-#### Step 1.3 Execute this command (it allows to run the script)
-```powershell
-    Set-ExecutionPolicy Bypass -Scope Process -Force
-```
-#### Step 1.4 Execute the script with the command
-```powershell
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.1** Download the script qiskit_installer.ps1
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.2** Open a powershell console and navigate to the qiksit_installer.ps1 download file
+  
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.3** Execute this command (it allows to run the script)
+  ```powershell
+  Set-ExecutionPolicy Bypass -Scope Process -Force
+  ```
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.4** Execute the script with the command
+  ```powershell
   .\qiskit_installer.ps1
-```
+  ```
 
 ### Step 2: Accept the licences when the window opens
 
-image of the window !
+image of the window ! (GIF accepting the licenses)
 
 ### Step 3: Wait for the downloading of the packages
 
@@ -61,10 +62,9 @@ Visual studio code will automaticaly open with a jupyter notebook to setup your 
 
 ### Step 4: Follow the instructions of the notebook
 
-You can also download the ibm_quantum notebook manually
+You can also download the setup [notebook](https://raw.githubusercontent.com/ket-q/qiskit_windows_installer_pub/refs/heads/main/notebooks/IBM_account_setup.ipynb) manually.
 
 ### Step 5 (Optional): We recommended to save this setup notebook in your quantum working folder
-
 
 
 
@@ -74,12 +74,14 @@ You can also download the ibm_quantum notebook manually
 
 To use this properly, you need to select the correct interpreter when running your script. 
 
-With VS Code:
+With VS Code (for Python or Jupyter):
 1. Open the command palette (Ctrl + Shift + P)
 2. Select "Python : select interpreter"
-3. Select "Python 3.* (Qiskit 1.*)"
+3. Select our qiskit environnement "Python 3.* (Qiskit 1.*)"
 
-You can now run Qiskit on windows.
+PUT A GIF TO SHOW THIS
+
+You can now run Qiskit on Windows.
 
 
 ## ❓ FAQ / SUPPORT
@@ -89,16 +91,21 @@ You can now run Qiskit on windows.
 
 ## 📜 License
 
-License of this installer is
+[License of this installer](https://github.com/ket-q/qiskit_windows_installer_pub/blob/main/LICENSE)
 
 During the installation, you are required to accept mutilple licences:
 - [Visual studio code](https://code.visualstudio.com/license)
-- [Qikit](https://github.com/Qiskit/qiskit/blob/main/LICENSE.txt)
-- Python
-- Pyenv-win
+- [Qiskit](https://github.com/Qiskit/qiskit/blob/main/LICENSE.txt)
+- [Python](https://docs.python.org/3/license.html#terms-and-conditions-for-accessing-or-otherwise-using-python)
+- [Pyenv-win](https://pyenv-win.github.io/pyenv-win/#license-and-copyright)
 
 
 ## 🔌 Technical details 
+
+
+### Qiskit Windows installer
+
+The installer itself does not stay resident in the system as it stay isolated sinde your %appdata% to prevent any conflict from happenning.
 
 ### Pipenv
 [Pipenv](https://pipenv.pypa.io/en/latest/) is a tool to manage Python virtual environments and their software packages, and to facilitate packaging of packages present in a virtual environment.

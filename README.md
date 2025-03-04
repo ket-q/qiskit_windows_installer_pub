@@ -26,13 +26,45 @@ This installer will set up Qiskit and a local copy of VSCode on your computer, w
 
 ## 💥 QuickStart / Installation 
 
-### 1. First method (.exe):
+### Step 1 (first method) Download and execute the qiskit_installer.exe :
 
-**An exe file is generated for you, but if the script is availabe if you want to check it before running it**
+**An exe file is generated for you, but the script is availabe if you want to check it before running it**
 
 Download and execute our [Qiskit Windows Installer](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)
 
-### 2. Second method (run script with powershell):
+   
+### Step 1. (second method) Run script with powershell:
+
+#### Step 1.1 Download the script qiskit_installer.ps1
+
+#### Step 1.2 Open a powershell console and navigate to the qiksit_installer.ps1 download file
+
+
+#### Step 1.3 Execute this command (it allows to run the script)
+```powershell
+    Set-ExecutionPolicy Bypass -Scope Process -Force
+```
+#### Step 1.4 Execute the script with the command
+```powershell
+  .\qiskit_installer.ps1
+```
+
+### Step 2: Accept the licences when the window opens
+
+image of the window !
+
+### Step 3: Wait for the downloading of the packages
+
+Image of the installation done !
+
+Visual studio code will automaticaly open with a jupyter notebook to setup your qiskit account
+
+### Step 4: Follow the instructions of the notebook
+
+You can also download the ibm_quantum notebook manually
+
+### Step 5 (Optional): We recommended to save this setup notebook in your quantum working folder
+
 
 
 
@@ -50,11 +82,20 @@ With VS Code:
 You can now run Qiskit on windows.
 
 
-## ❓ FAQ
+## ❓ FAQ / SUPPORT
+
+
 
 
 ## 📜 License
 
+License of this installer is
+
+During the installation, you are required to accept mutilple licences:
+- [Visual studio code](https://code.visualstudio.com/license)
+- [Qikit](https://github.com/Qiskit/qiskit/blob/main/LICENSE.txt)
+- Python
+- Pyenv-win
 
 
 ## 🔌 Technical details 
@@ -104,3 +145,5 @@ pipenv --rm
 ### Poetry
 * Step-by-step installation ([link](https://gist.github.com/Isfhan/b8b104c8095d8475eb377230300de9b0)).
 * Official instructions ([link](https://python-poetry.org/docs/#installing-with-the-official-installer)).
+
+## 

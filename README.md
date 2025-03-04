@@ -1,13 +1,42 @@
-# qiskit_windows_installer 
-Installer for Qiskit on Microsoft Windows platforms.
-## Installation
-Before you begin, please read the Legal section (TBD).
+<div align="center">
+  <h1 align="center">Qiskit Installer for Windows</h1>
+  <h3 align="center">This installer will set up Qiskit and a local copy of VSCode on your computer, with a ready-to-use Python virtual environment for Jupyter notebooks.</h3>
+</div>
+
+<div align="center">
+
+  <!-- PROJECT LOGO -->
+  <br />
+    
+  <img alt="QiskitWindowslogo" src="ressources/asset/Logo.jpg" width="700" height="250">
+    
+  <br />
+</div>
+
+##  🔍 Overview 
+
+This installer will set up Qiskit and a local copy of VSCode on your computer, with a ready-to-use Python virtual environment for Jupyter notebooks.
+
+## ⚠️ Important notice before installing  
+
+- Only install software on a computer that is not production-level or mission-critical to you. (This is a general truth that does not pertain only to this installer.)
+- Create a fresh user account and log in under this account to install Qiskit ([link instructions on how to create a new user, perhaps we need to create our own video])
+- This will help insulate your Qiskit SDK from other software you may have installed on your computer.
+- This is particularly important if your computer already has a complicated installation history of software frameworks.
+
+## 💥 QuickStart / Installation 
+
+### 1. First method (.exe):
+
+**An exe file is generated for you, but if the script is availabe if you want to check it before running it**
+
+Download and execute our [Qiskit Windows Installer](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)
+
+### 2. Second method (run script with powershell):
 
 
-**Download and execute our [Qiskit Windows Installer](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)**
 
-
-## Usage
+## ✏️ Usage 
 
 ### This insaller creates a private environnement with Qiskit to avoid any conflicts.
 
@@ -20,8 +49,15 @@ With VS Code:
 
 You can now run Qiskit on windows.
 
-## Used tools 
 
+## ❓ FAQ
+
+
+## 📜 License
+
+
+
+## 🔌 Technical details 
 
 ### Pipenv
 [Pipenv](https://pipenv.pypa.io/en/latest/) is a tool to manage Python virtual environments and their software packages, and to facilitate packaging of packages present in a virtual environment.

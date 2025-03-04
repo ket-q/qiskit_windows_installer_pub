@@ -28,49 +28,49 @@ This installer will set up Qiskit and a local copy of VSCode on your computer, w
 
 
 
-### Step 1 (FIRST METHOD) Download and execute the [qiskit_installer.exe](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)
+#### Step 1️⃣ / FIRST Method (Recommended): Download and execute the [qiskit_installer.exe](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)
 *An executable file is generated for you, but the script is availabe if you want to check it before running it*
 
 Download and execute our [Qiskit Windows Installer](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)
 
   
-### Step 1 (SECOND METHOD) Run script with powershell:
+#### Step 1️⃣ / SECOND Method: Run script with powershell:
 
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.1** Download the script qiskit_installer.ps1
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.1** Download the script qiskit_installer.ps1
   
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.2** Open a powershell console and navigate to the qiksit_installer.ps1 download file
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.2** Open a powershell console and navigate to the qiksit_installer.ps1 download file
   
   
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.3** Execute this command (it allows to run the script)
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.3** Execute this command (it allows to run the script)
   ```powershell
-  Set-ExecutionPolicy Bypass -Scope Process -Force
+      Set-ExecutionPolicy Bypass -Scope Process -Force
   ```
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.4** Execute the script with the command
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.4** Execute the script with the command
   ```powershell
-  .\qiskit_installer.ps1
+      .\qiskit_installer.ps1
   ```
 
-### Step 2: Accept the licences when the window opens
+#### Step 2️⃣: Accept the licences when the window opens
 
 image of the window ! (GIF accepting the licenses)
 
-### Step 3: Wait for the downloading of the packages
+#### Step 3️⃣: Wait for the downloading of the packages
 
 Image of the installation done !
 
 Visual studio code will automaticaly open with a jupyter notebook to setup your qiskit account
 
-### Step 4: Follow the instructions of the notebook
+#### Step 4️⃣: Follow the instructions of the notebook
 
 You can also download the setup [notebook](https://raw.githubusercontent.com/ket-q/qiskit_windows_installer_pub/refs/heads/main/notebooks/IBM_account_setup.ipynb) manually.
 
-### Step 5 (Optional): We recommended to save this setup notebook in your quantum working folder
+#### Step 5️⃣ (Optional): We recommended to save this setup notebook in your quantum working folder
 
 
 
 ## ✏️ Usage 
 
-### This insaller creates a private environnement with Qiskit to avoid any conflicts.
+### This installer creates a private environnement with Qiskit to avoid any conflicts.
 
 To use this properly, you need to select the correct interpreter when running your script. 
 

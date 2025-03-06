@@ -75,7 +75,7 @@ To use this properly, you need to select the correct kernel/interpreter when run
 
 **With Jupyter Notebook**:
 
-![GIF select kernel](https://github.com/ket-q/qiskit_windows_installer_pub/blob/main/ressources/assets/selecting_interpreter.gif)
+![GIF select kernel](https://github.com/ket-q/qiskit_windows_installer_pub/blob/main/ressources/assets/select_interpreter.gif)
 
 1. Click "Select Kernel" on the top right
 2. Click "Python Environnements"

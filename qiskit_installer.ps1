@@ -1192,7 +1192,8 @@ Write-Header "Step 15: Open Visual Studio code with the notebook"
 try {
 
     Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ket-q/qiskit_windows_installer_pub/refs/heads/main/ressources/notebook/IBM_account_setup.ipynb" -OutFile "$env:USERPROFILE\Downloads\notebook.ipynb"
-    code "$env:USERPROFILE\Downloads\notebook.ipynb"
+    & code --disable-workspace-trust "$env:USERPROFILE\Downloads\notebook.ipynb"
+
 
     
 }

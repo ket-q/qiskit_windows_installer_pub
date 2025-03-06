@@ -86,8 +86,6 @@ To use this properly, you need to select the correct kernel/interpreter when run
 2. Select "Python : select interpreter"
 3. Select our qiskit environnement "Python 3.* (Qiskit 1.*)"
 
-PUT A GIF TO SHOW THIS
-
 You can now run Qiskit on Windows.
 
 

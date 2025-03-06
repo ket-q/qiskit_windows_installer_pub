@@ -8,7 +8,7 @@
   <!-- PROJECT LOGO -->
   <br />
     
-  <img alt="QiskitWindowslogo" src="ressources/asset/Logo.jpg" width="700" height="250">
+  <img alt="QiskitWindowslogo" src="ressources/assets/Logo.jpg" width="700" height="250">
     
   <br />
 </div>
@@ -52,11 +52,10 @@ Download and execute our [Qiskit Windows Installer](https://github.com/ket-q/qis
 
 #### Step 2️⃣: Accept the licences when the window opens
 
-image of the window ! (GIF accepting the licenses)
+![GIF aceppting licenses](https://github.com/ket-q/qiskit_windows_installer_pub/blob/main/ressources/assets/accepting_licenses.gif)
 
-#### Step 3️⃣: Wait for the downloading of the packages
 
-Image of the installation done !
+#### Step 3️⃣: Wait for the downloading of the packages and the opening of Visual Studio Code
 
 Visual studio code will automaticaly open with a jupyter notebook to setup your qiskit account
 
@@ -72,9 +71,17 @@ You can also download the setup [notebook](https://raw.githubusercontent.com/ket
 
 ### This installer creates a private environnement with Qiskit to avoid any conflicts.
 
-To use this properly, you need to select the correct interpreter when running your script. 
+To use this properly, you need to select the correct kernel/interpreter when running your script:
 
-With VS Code (for Python or Jupyter):
+**With Jupyter Notebook**:
+
+![GIF select kernel](https://github.com/ket-q/qiskit_windows_installer_pub/blob/main/ressources/assets/selecting_interpreter.gif)
+
+1. Click "Select Kernel" on the top right
+2. Click "Python Environnements"
+3. Click "qiskit"
+
+**With Non-Jupyter Notebook:**
 1. Open the command palette (Ctrl + Shift + P)
 2. Select "Python : select interpreter"
 3. Select our qiskit environnement "Python 3.* (Qiskit 1.*)"

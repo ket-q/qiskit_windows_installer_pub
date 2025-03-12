@@ -860,7 +860,7 @@ function Licenses-window{
 #
 # Main
 #
-Write-Header 'Step 1: Set install script execution policy'
+Write-Header 'Step 1/15: Set install script execution policy'
 try {
     Set-ExecutionPolicy Bypass -Scope Process -Force
 }
@@ -868,13 +868,13 @@ catch {
     Log-Err 'fatal' 'install script execution policy' $($_.Exception.Message)
 }
 
-Write-Header 'Step 2: Check installation platform'
+Write-Header 'Step 2/15: Check installation platform'
 Check-Installation-Platform
 
 #
 # Set up installer root directory structure
 #
-Write-Header 'Step 3: set up installer root folder structure'
+Write-Header 'Step 3/15: set up installer root folder structure'
 if (!(Test-Path $ROOT_DIR)){
     New-Item -Path $ROOT_DIR -ItemType Directory
 }
@@ -892,7 +892,7 @@ if ( !($qinst_root_obj.PSIsContainer) ) {
 }
 
 # Create log directory
-Write-Header 'Step 3a: set up log folder'
+Write-Header 'Step 3a/15: set up log folder'
 try {
     if ( !(Test-Path $LOG_DIR) ) {
         # Log folder does not exist yet => create
@@ -915,7 +915,7 @@ catch {
 
 # Create the enclave folder $ROOT_DIR\$qwi_vstr. This is from where we
 # set up the virtual environment.
-Write-Header 'Step 3b: set up enclave folder'
+Write-Header 'Step 3b/15: set up enclave folder'
 try {
     $ENCLAVE_DIR = Join-Path $ROOT_DIR -ChildPath $qwi_vstr
     if (!(Test-Path $ENCLAVE_DIR)) {
@@ -935,7 +935,7 @@ catch {
 # Get software license checked by user
 #
 
-Write-Header 'Step 4: check software licenses'
+Write-Header 'Step 4/15: check software licenses'
 
 
 try {
@@ -965,9 +965,9 @@ catch {
 #
 # VSCode
 #
-Write-Header 'Step 5: Install VSCode'
+Write-Header 'Step 5/15: Install VSCode'
 if ( !(Get-Command code -ErrorAction SilentlyContinue) ) {
-    Log-Status 'VSCode not not installed, running installer'
+    Log-Status 'VSCode not installed, running installer'
     Install-VSCode
     Refresh-PATH
     # Ensure VScode installation succeeded:
@@ -993,7 +993,7 @@ Install-VSCode-Extension 'ms-toolsai.jupyter'
 #
 # pyenv-win
 #
-Write-Header 'Step 6: Install pyenv-win'
+Write-Header 'Step 6/15: Install pyenv-win'
 if ( !(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
     Log-Status 'pyenv-win not installed, running installer'
     Install-pyenv-win
@@ -1022,7 +1022,7 @@ if ( !(Get-Command pyenv -ErrorAction SilentlyContinue) ) {
 # (4) Use pipenv to create the ``official'' venv visible to the user in VSCode
 #
 
-Write-Header "Step 7: Check if pyenv supports Python $python_version"
+Write-Header "Step 7/15: Check if pyenv supports Python $python_version"
 if ( !(Lookup-pyenv-Cache $python_version $ROOT_DIR) ) {
     $err_msg = (
         "Requested Python version $python_version not available with pyenv.",
@@ -1032,7 +1032,7 @@ if ( !(Lookup-pyenv-Cache $python_version $ROOT_DIR) ) {
     Log-Err 'fatal' "availability-check of Python $python_version" $err_msg    
 }
 
-Write-Header "Step 8: Set up Python $python_version for venv"
+Write-Header "Step 8/15: Set up Python $python_version for venv"
 try {
     $err = Invoke-Native pyenv install $python_version
     $err = Invoke-Native pyenv local $python_version
@@ -1105,7 +1105,7 @@ catch {
 Download-File $req_URL ${requirements_file}
 
 # Create venv
-Write-Header "Step 9: Set up venv $MY_VENV_DIR"
+Write-Header "Step 9/15: Set up venv $MY_VENV_DIR"
 try {
     # create venv
     Invoke-Native pyenv exec python -m venv $MY_VENV_DIR
@@ -1122,7 +1122,7 @@ catch {
 #
 
 # Update pip of venv
-Write-Header "Step 10: update pip of venv $MY_VENV_DIR"
+Write-Header "Step 10/15: update pip of venv $MY_VENV_DIR"
 try {
     Invoke-Native python -m pip install --upgrade pip
 }
@@ -1131,7 +1131,7 @@ catch {
 }
 
 # Install ipykernel module in venv
-Write-Header "Step 11: install ipykernel module in venv $MY_VENV_DIR"
+Write-Header "Step 11/15: install ipykernel module in venv $MY_VENV_DIR"
 try {
     Invoke-Native pip install ipykernel
 }
@@ -1144,7 +1144,7 @@ catch {
 }
 
 # Install Qiskit in venv
-Write-Header "Step 12: install Qiskit in venv $MY_VENV_DIR"
+Write-Header "Step 12/15: install Qiskit in venv $MY_VENV_DIR"
 try {   
     Invoke-Native pip install -r $requirements_file
 }
@@ -1157,7 +1157,7 @@ catch {
 }
 
 # Install Jupyter server in venv
-Write-Header "Step 13: install ipykernel kernel in venv $MY_VENV_DIR"
+Write-Header "Step 13/15: install ipykernel kernel in venv $MY_VENV_DIR"
 try {
     $args = "-m", "ipykernel", "install",
         "--user",
@@ -1175,9 +1175,9 @@ catch {
 }
 
 # Test the installation
-Write-Header "Step 14: testing the installation in $MY_VENV_DIR"
-Test-symeng-Module
-# Test-qiskit-Version
+Write-Header "Step 14/15: testing the installation in $MY_VENV_DIR"
+#Test-symeng-Module
+Test-qiskit-Version
 
 # Deactivate the Python venv
 try {
@@ -1188,11 +1188,13 @@ catch {
 }
 
 
-Write-Header "Step 15: Open Visual Studio code with the notebook"
+Write-Header "Step 15/15: Open Visual Studio code with the notebook"
 try {
 
     Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ket-q/qiskit_windows_installer_pub/refs/heads/main/ressources/notebook/IBM_account_setup.ipynb" -OutFile "$env:USERPROFILE\Downloads\notebook.ipynb"
-    & code --disable-workspace-trust "$env:USERPROFILE\Downloads\notebook.ipynb"
+    Invoke-Native code
+    Stop-Process -Name "Code" -Force
+    Invoke-Native code --add --disable-workspace-trust "$env:USERPROFILE\Downloads\notebook.ipynb"
 
 
     
@@ -1203,6 +1205,7 @@ catch {
 
 Log-Status "INSTALLATION DONE"
 
+Start-Sleep -Seconds 30
 
 # Done
 Exit 0

@@ -18,9 +18,8 @@
 ## ⚠️ Important notice before installing  
 
 - Only install software on a computer that is not production-level or mission-critical to you. (This is a general truth that does not pertain only to this installer.)
-- Create a fresh user account and log in under this account to install Qiskit ([link instructions on how to create a new user, perhaps we need to create our own video])
-- This will help insulate your Qiskit SDK from other software you may have installed on your computer.
-- This is particularly important if your computer already has a complicated installation history of software frameworks.
+
+- If the installation fails: Create a fresh user account and log in under this account to install Qiskit ([link instructions on how to create a new user, perhaps we need to create our own video]).This will help insulate your Qiskit SDK from other software you may have installed on your computer. This is particularly important if your computer already has a complicated installation history of software frameworks.
 
 ## 💥 QuickStart / Installation 
 
@@ -36,16 +35,17 @@ Download and execute our [Qiskit Windows Installer](https://github.com/ket-q/qis
 
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.1** Download the script qiskit_installer.ps1
   
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.2** Open a powershell console and navigate to the qiksit_installer.ps1 download file
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.2** Open a powershell console and navigate to the qiksit_installer.ps1 download file.
+  Usually, when opening a powershell you will be placed at the user root and you need to go to the Downloads (or any other folder where you downloaded the script)
   
+    ```powershell
+      cd .\Downloads
+    ```
   
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.3** Execute this command (it allows to run the script)
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.3** Execute this command 
   ```powershell
-      Set-ExecutionPolicy Bypass -Scope Process -Force
-  ```
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.4** Execute the script with the command
-  ```powershell
-      .\qiskit_installer.ps1
+      Set-ExecutionPolicy Bypass -Scope Process -Force && .\qiskit_installer.ps1
+
   ```
 
 #### Step 2️⃣: Accept the licences when the window opens
@@ -67,11 +67,11 @@ You can also download the setup [notebook](https://raw.githubusercontent.com/ket
 
 ## ✏️ Usage 
 
-### This installer creates a private environnement with Qiskit to avoid any conflicts.
+This installer creates a private environnement with Qiskit to avoid any conflicts.
 
-To use this properly, you need to select the correct kernel/interpreter when running your script:
+### You need to will to select the correct kernel/interpreter for every new file using Qiskit:
 
-**With Jupyter Notebook**:
+**With any Jupyter Notebook**:
 
 ![GIF select kernel](https://github.com/ket-q/qiskit_windows_installer_pub/blob/main/ressources/assets/select_interpreter.gif)
 
@@ -79,7 +79,7 @@ To use this properly, you need to select the correct kernel/interpreter when run
 2. Click "Python Environnements"
 3. Click "qiskit"
 
-**With Non-Jupyter Notebook:**
+**With Non-Jupyter Notebook (Python or Python based):**
 
 1. Open the command palette (Ctrl + Shift + P)
 2. Select "Python : select interpreter"

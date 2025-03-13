@@ -19,7 +19,7 @@
 
 - Only install software on a computer that is not production-level or mission-critical to you. (This is a general truth that does not pertain only to this installer.)
 
-- If the installation fails: Create a fresh user account and log in under this account to install Qiskit ([link instructions on how to create a new user, perhaps we need to create our own video]).This will help insulate your Qiskit SDK from other software you may have installed on your computer. This is particularly important if your computer already has a complicated installation history of software frameworks.
+- If the installation fails: Create a fresh user account and log in under this account to install Qiskit.This will help insulate your Qiskit SDK from other software you may have installed on your computer. This is particularly important if your computer already has a complicated installation history of software frameworks.
 
 ## 💥 QuickStart / Installation 
 

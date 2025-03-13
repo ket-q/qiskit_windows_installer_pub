@@ -38,9 +38,9 @@ Download and execute our [Qiskit Windows Installer](https://github.com/ket-q/qis
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.2** Open a powershell console and navigate to the qiksit_installer.ps1 download file.
   Usually, when opening a powershell you will be placed at the user root and you need to go to the Downloads (or any other folder where you downloaded the script)
   
-    ```powershell
+  ```powershell
       cd .\Downloads
-    ```
+  ```
   
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.3** Execute this command 
   ```powershell

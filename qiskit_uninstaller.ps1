@@ -344,7 +344,7 @@ Log-Status 'Removed PYENV, PYENV_HOME, PYENV_ROOT environment variables.'
 #
 # Main
 #
-Write-Header 'Step 1: Set install script execution policy'
+Write-Header 'Step 1/6: Set install script execution policy'
 try {
     Set-ExecutionPolicy Bypass -Scope Process -Force
 }
@@ -352,14 +352,14 @@ catch {
     Log-Err 'fatal' 'install script execution policy' $($_.Exception.Message)
 }
 
-Write-Header 'Step 2: delete installer root folder structure'
+Write-Header 'Step 2/6: delete installer root folder structure'
 
 
 if (Test-Path $ROOT_DIR) {
     Remove-Item -Path $ROOT_DIR -Recurse -Force
 }
 
-Write-Header 'Step 3/15: Uninstall VSCode'
+Write-Header 'Step 3/6: Uninstall VSCode'
 
 
 if ((Get-Command code -ErrorAction SilentlyContinue) ) {
@@ -382,7 +382,7 @@ if ((Get-Command code -ErrorAction SilentlyContinue) ) {
 }
 
 
-Write-Header 'Step 4/15: Uninstall pyenv-win'
+Write-Header 'Step 4/6: Uninstall pyenv-win'
 if ((Get-Command pyenv -ErrorAction SilentlyContinue) ) {
     Log-Status 'pyenv-win installed, running uninstaller'
     Uninstall-pyenv-win
@@ -403,7 +403,7 @@ if ((Get-Command pyenv -ErrorAction SilentlyContinue) ) {
 }
 
 
-Write-Header 'Step 5/15: Uninstalling .ipython'
+Write-Header 'Step 5/6: Uninstalling .ipython'
 
 try {
     $IPYTHON_PATH = Join-Path ${env:USERPROFILE} -ChildPath '.ipython'
@@ -415,7 +415,7 @@ catch {
 
 
 
-Write-Header 'Step 6/15: Uninstalling .virtualsenv'
+Write-Header 'Step 6/6: Uninstalling .virtualsenv'
 
 try {
     $DOT_VENVS_DIR = Join-Path ${env:USERPROFILE} -ChildPath '.virtualenvs'

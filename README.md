@@ -1,6 +1,5 @@
 <div align="center">
-  <h2 align="center">QI(skit) W(indows) I(nstaller)</h1>
-  <h3 align="center">This installer will set up Qiskit and a local copy of VSCode on your computer, with a ready-to-use Python virtual environment for Jupyter notebooks.</h3>
+  <h2 align="center">Qiskit Installer for WIndows</h1>
 </div>
 
 <div align="center">
@@ -8,18 +7,25 @@
   <!-- PROJECT LOGO -->
   <br />
     
-  <img alt="QiskitWindowslogo" src="ressources/assets/Logo.jpg" width="700" height="250">
+  <img alt="QiskitWindowslogo" src="ressources/assets/Logo.svg" width="700" height="250">
     
   <br />
 </div>
 
+##  📍 What is QIWI ?
 
+QIWI is a QIskit Windows installer will set up Qiskit and a local copy of VSCode on your computer, with a ready-to-use Python virtual environment for Jupyter notebooks.
 
-# ⚠️ Important notice before installing  
+<br />
+
+## ⚠️ Important notice before installing  
 
 - Only install software on a computer that is not production-level or mission-critical to you. (This is a general truth that does not pertain only to this installer.)
 
 - If the installation fails: Create a fresh user account and log in under this account to install Qiskit.This will help insulate your Qiskit SDK from other software you may have installed on your computer. This is particularly important if your computer already has a complicated installation history of software frameworks.
+
+<br />
+
 
 ## 💥 QuickStart / Installation
 
@@ -31,9 +37,9 @@
   
 - **METHOD 2** : Run script with powershell:
 
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.1** Download the script qiskit_installer.ps1
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1** Download the script qiskit_installer.ps1
   
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.2** Open a powershell console and navigate to the qiksit_installer.ps1 download file.\
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 2** Open a powershell console and navigate to the qiksit_installer.ps1 download file.\
   &nbsp;\
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Usually, when opening a powershell you will be placed at the user root and you need to go to the Downloads 
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;folder (or any other folder where you downloaded the script)*
@@ -42,7 +48,7 @@
       cd .\Downloads
   ```
   
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.3** Execute this command 
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 3** Execute this command 
   ```powershell
       Set-ExecutionPolicy Bypass -Scope Process -Force && .\qiskit_installer.ps1
 
@@ -51,7 +57,7 @@
 ---
 
 
-### 🚶 Step by step guide (after running/executing the script  
+### 🚶 Step by step guide (): 
 
 #### Step 1️⃣: Accept the licences when the window opens
 
@@ -68,6 +74,7 @@ You can also download the setup [notebook](https://raw.githubusercontent.com/ket
 
 #### Step 4️⃣ (Optional): We recommended to save this setup notebook in your quantum working folder
 
+<br />
 
 
 ## ✏️ Usage 

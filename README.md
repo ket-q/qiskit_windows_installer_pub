@@ -7,7 +7,7 @@
   <!-- PROJECT LOGO -->
   <br />
     
-  <img alt="QiskitWindowslogo" src="ressources/assets/Logo.svg" width="700" height="250">
+  <img alt="QiskitWindowslogo" src="ressources/assets/Logo.jpg" width="700" height="250">
     
   <br />
 </div>
@@ -22,20 +22,20 @@ QIWI is a QIskit Windows installer will set up Qiskit and a local copy of VSCode
 
 - Only install software on a computer that is not production-level or mission-critical to you. (This is a general truth that does not pertain only to this installer.)
 
-- If the installation fails: Create a fresh user account and log in under this account to install Qiskit.This will help insulate your Qiskit SDK from other software you may have installed on your computer. This is particularly important if your computer already has a complicated installation history of software frameworks.
+- If the installation fails: Create a fresh user account and log in under this account to install Qiskit. This will help insulate your Qiskit SDK from other software you may have installed on your computer. This is particularly important if your computer already has a complicated installation history of software frameworks.
 
 <br />
 
 
-## 💥 QuickStart / Installation
+## 💥 Installation
 
-### 🏃 Running the script !   
+### 🏃 Running the script!   
 
-- **METHOD 1** (Recommended): Download and execute the [qiskit_installer.exe](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)
+- **Method 1** (Recommended): Download and execute the [qiskit_installer.exe](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)
 *An executable file is generated for you, but the script is availabe if you want to check it before running it*
 
   
-- **METHOD 2** : Run script with powershell:
+- **Method 2** : Run script with powershell:
 
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1** Download the script qiskit_installer.ps1
   

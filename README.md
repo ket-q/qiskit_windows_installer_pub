@@ -55,7 +55,7 @@
 
 #### Step 1️⃣: Accept the licences when the window opens
 
-![GIF aceppting licenses](https://github.com/ket-q/qiskit_windows_installer_pub/blob/main/ressources/assets/accepting_licenses.gif)
+![GIF aceppting licenses](https://github.com/ket-q/qiskit_windows_installer_pub/blob/main/ressources/assets/accepting.gif)
 
 
 #### Step 2️⃣: Wait for the downloading of the packages and the opening of Visual Studio Code
@@ -78,7 +78,7 @@ You can also download the setup [notebook](https://raw.githubusercontent.com/ket
 
 ### With any Jupyter Notebook:
 
-![GIF select kernel](https://github.com/ket-q/qiskit_windows_installer_pub/blob/main/ressources/assets/select_interpreter.gif)
+![GIF select kernel](https://github.com/ket-q/qiskit_windows_installer_pub/blob/main/ressources/assets/select.gif)
 
 1. Click "Select Kernel" on the top right
 2. Click "Python Environnements"

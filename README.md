@@ -1,5 +1,5 @@
 <div align="center">
-  <h1 align="center">Qiskit Windows Installer</h1>
+  <h2 align="center">QIskit Windows Installer</h1>
   <h3 align="center">This installer will set up Qiskit and a local copy of VSCode on your computer, with a ready-to-use Python virtual environment for Jupyter notebooks.</h3>
 </div>
 

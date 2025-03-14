@@ -1,5 +1,5 @@
 <div align="center">
-  <h1 align="center">Qiskit Installer for Windows</h1>
+  <h2 align="center">QIskit Windows Installer</h1>
   <h3 align="center">This installer will set up Qiskit and a local copy of VSCode on your computer, with a ready-to-use Python virtual environment for Jupyter notebooks.</h3>
 </div>
 
@@ -15,30 +15,28 @@
 
 
 
-## ⚠️ Important notice before installing  
+# ⚠️ Important notice before installing  
 
 - Only install software on a computer that is not production-level or mission-critical to you. (This is a general truth that does not pertain only to this installer.)
 
 - If the installation fails: Create a fresh user account and log in under this account to install Qiskit.This will help insulate your Qiskit SDK from other software you may have installed on your computer. This is particularly important if your computer already has a complicated installation history of software frameworks.
 
-## 💥 QuickStart / Installation 
+## 💥 QuickStart / Installation
 
+### 🏃 Running the script !   
 
-
-#### Step 1️⃣ / FIRST Method (Recommended): Download and execute the [qiskit_installer.exe](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)
+- **METHOD 1** (Recommended): Download and execute the [qiskit_installer.exe](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)
 *An executable file is generated for you, but the script is availabe if you want to check it before running it*
 
-Download and execute our [Qiskit Windows Installer](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)
-
   
-#### Step 1️⃣ / SECOND Method: Run script with powershell:
+- **METHOD 2** : Run script with powershell:
 
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.1** Download the script qiskit_installer.ps1
   
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1.2** Open a powershell console and navigate to the qiksit_installer.ps1 download file.\
   &nbsp;\
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Usually, when opening a powershell you will be placed at the user root and you need to go to the Downloads folder 
-  (or any other folder &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;where you downloaded the script)*
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Usually, when opening a powershell you will be placed at the user root and you need to go to the Downloads 
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;folder (or any other folder where you downloaded the script)*
   
   ```powershell
       cd .\Downloads
@@ -50,30 +48,35 @@ Download and execute our [Qiskit Windows Installer](https://github.com/ket-q/qis
 
   ```
 
-#### Step 2️⃣: Accept the licences when the window opens
+---
+
+
+### 🚶 Step by step guide (after running/executing the script  
+
+#### Step 1️⃣: Accept the licences when the window opens
 
 ![GIF aceppting licenses](https://github.com/ket-q/qiskit_windows_installer_pub/blob/main/ressources/assets/accepting_licenses.gif)
 
 
-#### Step 3️⃣: Wait for the downloading of the packages and the opening of Visual Studio Code
+#### Step 2️⃣: Wait for the downloading of the packages and the opening of Visual Studio Code
 
 Visual studio code will automaticaly open with a jupyter notebook to setup your qiskit account
 
-#### Step 4️⃣: Follow the instructions of the notebook
+#### Step 3️⃣: Follow the instructions of the notebook
 
 You can also download the setup [notebook](https://raw.githubusercontent.com/ket-q/qiskit_windows_installer_pub/refs/heads/main/notebooks/IBM_account_setup.ipynb) manually.
 
-#### Step 5️⃣ (Optional): We recommended to save this setup notebook in your quantum working folder
+#### Step 4️⃣ (Optional): We recommended to save this setup notebook in your quantum working folder
 
 
 
 ## ✏️ Usage 
 
-This installer creates a private environnement with Qiskit to avoid any conflicts.
+### 🚩 You need to will to select the correct kernel/interpreter for every new file using Qiskit:  🚩 
 
-### You need to will to select the correct kernel/interpreter for every new file using Qiskit:
+---
 
-**With any Jupyter Notebook**:
+### With any Jupyter Notebook:
 
 ![GIF select kernel](https://github.com/ket-q/qiskit_windows_installer_pub/blob/main/ressources/assets/select_interpreter.gif)
 
@@ -81,7 +84,7 @@ This installer creates a private environnement with Qiskit to avoid any conflict
 2. Click "Python Environnements"
 3. Click "qiskit"
 
-**With Non-Jupyter Notebook (Python or Python based):**
+### With Non-Jupyter Notebook (Python or Python based):
 
 1. Open the command palette (Ctrl + Shift + P)
 2. Select "Python : select interpreter"

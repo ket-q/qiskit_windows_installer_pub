@@ -35,7 +35,7 @@ QIWI is a QIskit Windows installer will set up Qiskit and a local copy of VSCode
 
 - **Method 1** (recommended if you're ok with downloading and executing an executable on your computer):
 
-  - Download and execute the [qiskit_installer.exe](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)
+  - Download and execute the qiskit_installer.exe. ([Click here](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe))
   - A blue Windows box may appears because it consider our program as a threat, if so click on "More informations" and "Execute anyway".
 
 
@@ -43,19 +43,19 @@ QIWI is a QIskit Windows installer will set up Qiskit and a local copy of VSCode
   
 - **Method 2** (if you want visibility into what you will execute): Run script with powershell:
 
-  **- Step 1**: Download the script qiskit_installer.ps1
+  **Step 1**: Download the script qiskit_installer.ps1 ([Click here](https://raw.githubusercontent.com/ket-q/qiskit_windows_installer_pub/refs/heads/main/qiskit_installer.ps1))
   
-  **- Step 2**: Open a powershell console
+  **Step 2**: Open a powershell console
   - Press the Windows key.
   - Type "PowerShell" and click.  
 
-  **-Step 3**: Navigate to the qiksit_installer.ps1 download file.\
+  **Step 3**: Navigate to the qiksit_installer.ps1 download file.\
 *When opening a powershell you will be placed at the user root and you need to go to the Downloads folder (or any other folder where you downloaded the script)*
   
   ```powershell
   cd ~\Downloads
   ```
-  **Step 3** Execute the following command 
+  **Step 4** Execute the following command 
   ```powershell
   Set-ExecutionPolicy Bypass -Scope Process -Force && .\qiskit_installer.ps1
   ```

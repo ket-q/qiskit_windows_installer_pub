@@ -1,5 +1,5 @@
 <div align="center">
-  <h2 align="center">Qiskit Installer for WIndows</h1>
+  <h1 align="center">Qiskit Installer for WIndows</h1>
 </div>
 
 <div align="center">
@@ -7,7 +7,7 @@
   <!-- PROJECT LOGO -->
   <br />
     
-  <img alt="QiskitWindowslogo" src="ressources/assets/Logo.jpg" width="700" height="250">
+  <img alt="QiskitWindowslogo" src="ressources/assets/Logo.svg" width="700" height="300">
     
   <br />
 </div>
@@ -22,7 +22,7 @@ QIWI is a QIskit Windows installer will set up Qiskit and a local copy of VSCode
 
 - Only install software on a computer that is not production-level or mission-critical to you. (This is a general truth that does not pertain only to this installer.)
 
-- If the installation fails: Create a fresh user account and log in under this account to install Qiskit. This will help insulate your Qiskit SDK from other software you may have installed on your computer. This is particularly important if your computer already has a complicated installation history of software frameworks.
+- If the installation fails: Create a fresh user account ([tutorial video for it](https://www.youtube.com/watch?v=LpPZ1oBjsnM)) and log in under this account to install Qiskit. This will help insulate your Qiskit SDK from other software you may have installed on your computer. This is particularly important if your computer already has a complicated installation history of software frameworks.
 
 <br />
 
@@ -31,15 +31,15 @@ QIWI is a QIskit Windows installer will set up Qiskit and a local copy of VSCode
 
 ### 🏃 Running the script!   
 
-- **Method 1** (Recommended): Download and execute the [qiskit_installer.exe](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)
-*An executable file is generated for you, but the script is availabe if you want to check it before running it*
+- **Method 1** (recommended if you're ok with downloading and executing an executable on your computer): Download and execute the [qiskit_installer.exe](https://github.com/ket-q/qiskit_windows_installer_pub/raw/refs/heads/main/qiskit_installer.exe)
+
 
   
-- **Method 2** : Run script with powershell:
+- **Method 2** (if you want visibility into what you will execute) : Run script with powershell:
 
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 1** Download the script qiskit_installer.ps1
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **- Step 1**: Download the script qiskit_installer.ps1
   
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Step 2** Open a powershell console and navigate to the qiksit_installer.ps1 download file.\
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **- Step 2**: Open a powershell console and navigate to the qiksit_installer.ps1 download file.\
   &nbsp;\
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Usually, when opening a powershell you will be placed at the user root and you need to go to the Downloads 
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;folder (or any other folder where you downloaded the script)*
@@ -57,22 +57,27 @@ QIWI is a QIskit Windows installer will set up Qiskit and a local copy of VSCode
 ---
 
 
-### 🚶 Step by step guide (): 
+### 🚶 Step-by-step guide through the installation process: 
 
-#### Step 1️⃣: Accept the licences when the window opens
+#### Step 1️⃣: Accept the license agreements in the pop-up window
 
 ![GIF aceppting licenses](https://github.com/ket-q/qiskit_windows_installer_pub/blob/main/ressources/assets/accepting.gif)
 
 
-#### Step 2️⃣: Wait for the downloading of the packages and the opening of Visual Studio Code
+#### Step 2️⃣: Wait for the downloading of the packages and the opening of VS Code
 
-Visual studio code will automaticaly open with a jupyter notebook to setup your qiskit account
+Visual studio code will automaticaly open with a Jupyter notebook to setup your Qiskit account
 
-#### Step 3️⃣: Follow the instructions of the notebook
+#### Step 3️⃣: Step 3: Follow the step-by-step guide to run Jupyter notebooks and get you started on the IBM Quantum Platform. 
 
-You can also download the setup [notebook](https://raw.githubusercontent.com/ket-q/qiskit_windows_installer_pub/refs/heads/main/notebooks/IBM_account_setup.ipynb) manually.
+This setup notebok includes:
+- Selecting a Python interpreter for your Jupyter notebook
+- Adding your IBM Quantum API token to your Qiskit installation 
 
-#### Step 4️⃣ (Optional): We recommended to save this setup notebook in your quantum working folder
+
+*You can also download the [notebook](https://raw.githubusercontent.com/ket-q/qiskit_windows_installer_pub/refs/heads/main/notebooks/IBM_account_setup.ipynb) setup manually.*
+
+#### Step 4️⃣ (Optional): We recommended to save this setup notebook in a folder where you keep your quantum computing projects
 
 <br />
 
